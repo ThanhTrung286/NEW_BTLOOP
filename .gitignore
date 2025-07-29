@@ -1,0 +1,21 @@
+# Bỏ qua file biên dịch
+*.class
+
+# Thư mục build
+/bin/
+/build/
+/out/
+
+# IDE config (VS Code, IntelliJ, Eclipse)
+.vscode/
+.idea/
+*.iml
+
+# File tạm
+*.log
+*.tmp
+*.swp
+
+# Hệ thống
+.DS_Store
+Thumbs.db

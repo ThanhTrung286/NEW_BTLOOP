@@ -1,4 +1,4 @@
-package packagechung;
+package NEW_BTLOOP;
 
 public class Thesis extends Document {
     public String supervisor; // Người hướng dẫn
@@ -8,7 +8,9 @@ public class Thesis extends Document {
     // Constructor
     public Thesis() {
         super(); // Gọi constructor của lớp cha Document
-        this.inputThesisInfo(); // Nhập thông tin "luận văn"
+        this.supervisor = "";
+        this.university = "";
+        this.department = "";
     }
 
     //getInfo tài liệu

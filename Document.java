@@ -1,4 +1,4 @@
-package packagechung;
+package NEW_BTLOOP;
 
 import java.util.Scanner;
 
@@ -107,25 +107,35 @@ public class Document {
             System.out.println("Tài liệu tìm thấy theo tên:\n");
             for (Document doc : Library.documents) {
                 if (doc.title.toLowerCase().contains(keyword.toLowerCase())) {
-                    System.out.println(doc.getInfo());
+                    System.out.println(doc.title + " - " + doc.author + " - " + doc.ISBN);
                 }
             }
             // In thông tin tài liệu theo TÁC GIẢ
             System.out.println("Tài liệu tìm thấy theo tác giả:\n");
             for (Document doc : Library.documents) {
                 if (doc.author.toLowerCase().contains(keyword.toLowerCase())) {
-                    System.out.println(doc.getInfo());
+                    System.out.println(doc.title + " - " + doc.author + " - " + doc.ISBN);
                 }
             }
             // In thông tin tài liệu theo ISBN
             System.out.println("Tài liệu tìm thấy theo ISBN:\n");
             for (Document doc : Library.documents) {
                 if (doc.ISBN.toLowerCase().contains(keyword.toLowerCase())) {
-                    System.out.println(doc.getInfo());
+                    System.out.println(doc.title + " - " + doc.author + " - " + doc.ISBN);
                 }
             }
         } else {
             System.out.println("Không tìm thấy tài liệu nào phù hợp.");
         }
+    }
+
+    /**
+     * Hiển thị thông tin tài liệu. Chức năng 5
+     * @param None
+     * @return void
+     */
+    public void displayDocument() {
+        System.out.println("Thông tin tài liệu: ");
+        System.out.println(getInfo());
     }
 }

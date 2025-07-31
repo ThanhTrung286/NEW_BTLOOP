@@ -7,65 +7,63 @@ public class Menu {
         Scanner scanner = new Scanner(System.in);
         int choice;
 
-        DocManager docManager = new DocManager(); // Tạo đối tượng quản lý tài liệu
+        Library library = new Library(); // Tạo đối tượng quản lý tài liệu
 
         while (true) {
-            System.out.println("Welcome to My Application!");
-            System.out.println("[0] Exit");
-            System.out.println("[1] Add Document");
-            System.out.println("[2] Remove Document");
-            System.out.println("[3] Update Document");
-            System.out.println("[4] Find Document");
-            System.out.println("[5] Display Document");
-            System.out.println("[6] Add User");
-            System.out.println("[7] Borrow Document");
-            System.out.println("[8] Return Document");
-            System.out.println("[9] Display User Info");
-            System.out.print("Please choose an option: ");
+            System.out.println("QUẢN LÝ THƯ VIỆN!");
+            System.out.println("[0] Thoát");
+            System.out.println("[1] Thêm tài liệu");
+            System.out.println("[2] Xoá tài liệu");
+            System.out.println("[3] Sửa thông tin tài liệu");
+            System.out.println("[4] Tìm tài liệu");
+            System.out.println("[5] Xem danh sách tài liệu");
+            //System.out.println("[6] Add User");
+            System.out.println("[6] Mượn tài liệu");
+            System.out.println("[7] Trả tài liệu");
+            //System.out.println("[9] Display User Info");
+            System.out.print("Chọn chức năng: ");
 
             if (scanner.hasNextInt()) {
                 choice = scanner.nextInt();
-                scanner.nextLine(); 
+                scanner.nextLine();
 
                 switch (choice) {
                     case 0:
-                        System.out.println("Exiting application. Goodbye!");
-                        return;
-                    case 1: 
-                        System.out.println(">> Add Document selected");      
+                        System.out.println(">> Chương trình đã thoát");
+                        System.exit();
+                    case 1:
+                        System.out.println(">> Thêm tài liệu");
+                        library.addDocument();
                         break;
                     case 2:
-                        System.out.println(">> Remove Document selected");
+                        System.out.println(">> Xoá tài liệu");
+                        library.removeDocument();
                         break;
                     case 3:
-                        System.out.println(">> Update Document selected");
+                        System.out.println(">> Sửa thông tin tài liệu");
+                        library.updateDocument();
                         break;
                     case 4:
-                        System.out.println(">> Find Document selected");
+                        System.out.println(">> Tìm tài liệu");
+                        library.searchMenu();
                         break;
                     case 5:
-                        System.out.println(">> Display Document selected");
+                        System.out.println(">> Xem danh sách tài liệu");
+                        library.displayDocuments();
                         break;
                     case 6:
-                        System.out.println(">> Add User selected");
+                        System.out.println(">> Mượn tài liệu");
+                        library.borrowDocument();
                         break;
                     case 7:
-                        System.out.println(">> Borrow Document selected");
+                        System.out.println(">> Trả tài liệu");
+                        library.returnDocument();
                         break;
-                    case 8:
-                        System.out.println(">> Return Document selected");
-                        break;
-                    case 9:
-                        System.out.println(">> Display User Info selected");
-                        break;
-                    default:
-                        System.out.println("Action is not supported");
                 }
             } else {
-                System.out.println("Action is not supported");
-                scanner.nextLine(); // Xóa nhập sai 
+                System.out.println("Lựa chọn không hợp lệ.");
+                scanner.nextLine(); // Xóa nhập sai
             }
         }
     }
 }
-

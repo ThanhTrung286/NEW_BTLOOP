@@ -13,30 +13,36 @@ public class Thesis extends Document {
         this.department = "";
     }
 
-    //getInfo tài liệu
+    // getInfo tài liệu
     @Override
     public String getInfo() {
-        return super.getInfo() + ", Người hướng dẫn: " + supervisor + ", Trường đại học: " + university + ", Khoa: " + department;
+        return super.getInfo() + ", Người hướng dẫn: " + supervisor + ", Trường đại học: " + university + ", Khoa: "
+                + department;
     }
-    
-    //getter, setter Supervisor.
+
+    // getter, setter Supervisor.
     public String getSupervisor() {
         return supervisor;
     }
+
     public void setSupervisor(String supervisor) {
         this.supervisor = supervisor;
     }
-    //getter, setter University.
+
+    // getter, setter University.
     public String getUniversity() {
         return university;
-    }   
+    }
+
     public void setUniversity(String university) {
         this.university = university;
     }
-    //getter, setter Department.
+
+    // getter, setter Department.
     public String getDepartment() {
         return department;
     }
+
     public void setDepartment(String department) {
         this.department = department;
     }
@@ -45,12 +51,14 @@ public class Thesis extends Document {
     public int getYear() {
         return super.year;
     }
+
     public void setYear(int year) {
         super.year = year;
     }
 
     /**
      * Nhập thông tin luận văn. Chức năng 1
+     * 
      * @param None
      * @return void
      */
@@ -73,7 +81,8 @@ public class Thesis extends Document {
 
     /**
      * Cập nhật thông tin luận văn. Chức năng 3
-     * @param None  
+     * 
+     * @param None
      * @return void
      */
     public void updateThesis() {
@@ -93,8 +102,45 @@ public class Thesis extends Document {
         read.nextLine(); // Đọc ký tự newline còn lại sau nextInt()
     }
 
+    public static void searchThesesByTitle(String keyword) {
+        System.out.println(">> KẾT QUẢ LUẬN VĂN THEO TIÊU ĐỀ:");
+        for (Thesis thesis : Library.theses) {
+            if (thesis.title.toLowerCase().contains(keyword.toLowerCase())) {
+                System.out.println(thesis.getInfo());
+            }
+        }
+    }
+
+    public static void searchThesesByAuthor(String keyword) {
+        System.out.println(">> KẾT QUẢ LUẬN VĂN THEO TÁC GIẢ:");
+        for (Thesis thesis : Library.theses) {
+            if (thesis.author.toLowerCase().contains(keyword.toLowerCase())) {
+                System.out.println(thesis.getInfo());
+            }
+        }
+    }
+
+    public static void searchThesesByID(String keyword) {
+        System.out.println(">> KẾT QUẢ LUẬN VĂN THEO MÃ ID:");
+        for (Thesis thesis : Library.theses) {
+            if (thesis.ID.toLowerCase().contains(keyword.toLowerCase())) {
+                System.out.println(thesis.getInfo());
+            }
+        }
+    }
+
+    public static void searchThesesBySupervisor(String keyword) {
+        System.out.println(">> KẾT QUẢ LUẬN VĂN THEO NGƯỜI HƯỚNG DẪN:");
+        for (Thesis thesis : Library.theses) {
+            if (thesis.supervisor.toLowerCase().contains(keyword.toLowerCase())) {
+                System.out.println(thesis.getInfo());
+            }
+        }
+    }
+
     /**
      * Hiển thị thông tin luận văn. Chức năng 5
+     * 
      * @param None
      * @return void
      */

@@ -94,56 +94,6 @@ public class Document {
 
         this.avail = this.total - this.borrowed; // Cập nhật số lượng có sẵn
     }
-
-    /**
-     * Tìm kiếm tài liệu. Chức năng 4
-     * @param String keyword Từ khóa tìm kiếm
-     * @return void
-     */
-    public void findDocument(String keyword) {
-        // Kiểm tra xem từ khóa có trong tiêu đề, tác giả hoặc ID không
-        if (this.title.toLowerCase().contains(keyword.toLowerCase()) || this.author.toLowerCase().contains(keyword.toLowerCase()) || this.ID.toLowerCase().contains(keyword.toLowerCase())) { 
-            // In thông tin tài liệu theo TÊN
-            System.out.println("Tài liệu tìm thấy theo tên:\n");
-            for (Document doc : Library.documents) {
-                if (doc.title.toLowerCase().contains(keyword.toLowerCase())) {
-                    System.out.println(doc.title + " - " + doc.author + " - " + doc.ID);
-                }
-            }
-            // In thông tin tài liệu theo TÁC GIẢ
-            System.out.println("Tài liệu tìm thấy theo tác giả:\n");
-            for (Document doc : Library.documents) {
-                if (doc.author.toLowerCase().contains(keyword.toLowerCase())) {
-                    System.out.println(doc.title + " - " + doc.author + " - " + doc.ID);
-                }
-            }
-            // In thông tin tài liệu theo ID
-            System.out.println("Tài liệu tìm thấy theo ID:\n");
-            for (Document doc : Library.documents) {
-                if (doc.ID.toLowerCase().contains(keyword.toLowerCase())) {
-                    System.out.println(doc.title + " - " + doc.author + " - " + doc.ID);
-                }
-            }
-        } else {
-            System.out.println("Không tìm thấy tài liệu nào phù hợp.");
-        }
-    }
-
-    /**
-     * Hiển thị thông tin tài liệu + danh sách tài liệu. Chức năng 5
-     * @param None
-     * @return void
-     */
-    // Hiển thị danh sách tài liệu
-    public void displayDocument() {
-        System.out.println("Danh sách tài liệu: ");
-        for (Document doc : Library.documents) {
-            if (doc != null) {
-                System.out.println(doc.title + " - " + doc.author + " - " + doc.ID );
-            }
-        }
-    }
-
     /**
      * Mượn tài liệu. Chức năng 7
      * @param None  

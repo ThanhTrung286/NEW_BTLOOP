@@ -4,6 +4,7 @@ public class Book extends Document {
     public String publisher; // Nhà xuất bản
     public int numberOfPages; // Số trang
     public String genre; // Thể loại
+    public String ISBN; // Mã ISBN
 
     // Constructor
     public Book() {
@@ -11,6 +12,7 @@ public class Book extends Document {
         this.publisher = "";
         this.numberOfPages = 0;
         this.genre = "";
+        this.ISBN = "";
     }
 
     //getInfo tài liệu
@@ -19,8 +21,9 @@ public class Book extends Document {
         return super.getInfo() + "\n" +
                 "Nhà xuất bản: " + publisher + "\n" +
                 "Số trang: " + numberOfPages + "\n" +
-                "Thể loại: " + genre;
-    }  
+                "Thể loại: " + genre + "\n" +
+                "Mã ISBN: " + ISBN;
+    }
 
     //getter, setter Publisher.
     public String getPublisher() {
@@ -43,8 +46,15 @@ public class Book extends Document {
     public void setGenre(String genre) {
         this.genre = genre;
     }
+    public String getISBN() {
+        return ISBN;
+    }
+    public void setISBN(String ISBN) {
+        this.ISBN = ISBN;
+    }
 
     // kiểm tra thể loại
+    //có cần không????
     public boolean isGenre(String genre) {
         return this.genre.equalsIgnoreCase(genre);
     }
@@ -57,6 +67,9 @@ public class Book extends Document {
     public void addBook() {
         addDocument(); // Gọi phương thức addDocument() để nhập thông tin chung
 
+        System.out.println("Nhập mã ISBN: ");
+        this.ISBN = read.nextLine();
+        
         System.out.println("Nhập nhà xuất bản: ");
         this.publisher = read.nextLine();
 
@@ -76,6 +89,9 @@ public class Book extends Document {
     public void updateBook() {
         updateDocument(); // Gọi phương thức updateDocument() để cập nhật thông tin chung
 
+        System.out.println("Nhập mã ISBN mới: ");
+        this.ISBN = read.nextLine();
+        
         System.out.println("Nhập nhà xuất bản mới: ");
         this.publisher = read.nextLine();
 
@@ -86,5 +102,13 @@ public class Book extends Document {
         System.out.println("Nhập thể loại mới: ");
         this.genre = read.nextLine();
     }
-}
 
+    /** 
+    * Hiển thị thông tin sách. Chức năng 5
+    * @param None
+    * @return void
+    */
+    public void displayBook() {
+        System.out.println("Thông tin sách: \n" + getInfo());
+    }
+}

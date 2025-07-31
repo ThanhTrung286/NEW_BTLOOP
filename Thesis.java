@@ -92,4 +92,13 @@ public class Thesis extends Document {
         this.year = read.nextInt();
         read.nextLine(); // Đọc ký tự newline còn lại sau nextInt()
     }
+
+    /**
+     * Hiển thị thông tin luận văn. Chức năng 5
+     * @param None
+     * @return void
+     */
+    public void displayThesis() {
+        System.out.println("Thông tin luận văn: \n" + getInfo());
+    }
 }

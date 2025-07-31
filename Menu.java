@@ -31,9 +31,8 @@ public class Menu {
                     case 0:
                         System.out.println("Exiting application. Goodbye!");
                         return;
-                    case 1: //Thêm tài liệu
-                        System.out.println(">> Add Document selected");
-                        
+                    case 1: 
+                        System.out.println(">> Add Document selected");      
                         break;
                     case 2:
                         System.out.println(">> Remove Document selected");

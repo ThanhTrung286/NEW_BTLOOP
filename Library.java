@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Library {
+    public static ArrayList<User> users = new ArrayList<>();
     public static ArrayList<Book> books = new ArrayList<>();
     public static ArrayList<Thesis> theses = new ArrayList<>();
     private Scanner scanner = new Scanner(System.in);
@@ -191,5 +192,20 @@ public class Library {
         }
 
         System.out.println("Không tìm thấy tài liệu.");
+    }
+    
+     // Chức năng 9: Thêm người dùng
+    public void addUser() {
+        User user = new User();
+        users.add(user);
+        System.out.println("Đã thêm người dùng.");
+    }
+
+    // Chức năng 10: Hiển thị người dùng
+    public void displayUser() {
+        System.out.println("--- DANH SÁCH NGƯỜI DÙNG ---");
+        for (User user : users) {
+            System.out.println(user.getInfo());
+        }
     }
 }

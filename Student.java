@@ -25,14 +25,14 @@ public class Student extends User {
         this.studentID = studentID;
     }
     
-      @Override
+    @Override
     // Mượn tài liệu nếu còn trong giới hạn
     public void borrowDocument(int amount) {
         if (borrowedDocuments + amount <= borrowedLimit) {
             borrowedDocuments += amount;
-            System.out.println("✔ Bạn đã mượn " + amount + " tài liệu.");
+            System.out.println("Bạn đã mượn thành công: " + amount + " tài liệu.");
         } else {
-            System.out.println("❌ Không thể mượn thêm. Vượt quá giới hạn!");
+            System.out.println("Không thể mượn thêm. Vượt quá giới hạn!");
         }
     }
 
@@ -41,9 +41,9 @@ public class Student extends User {
     public void returnDocument(int amount) {
         if (borrowedDocuments - amount >= 0) {
             borrowedDocuments -= amount;
-            System.out.println("✔ Bạn đã trả " + amount + " tài liệu.");
+            System.out.println("Bạn đã trả thành công: " + amount + " tài liệu.");
         } else {
-            System.out.println("❌ Số lượng trả không hợp lệ.");
+            System.out.println("Số lượng trả không hợp lệ.");
         }
     }
 }

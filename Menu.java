@@ -17,10 +17,10 @@ public class Menu {
             System.out.println("[3] Sửa thông tin tài liệu");
             System.out.println("[4] Tìm tài liệu");
             System.out.println("[5] Xem danh sách tài liệu");
-            //System.out.println("[6] Add User");
-            System.out.println("[6] Mượn tài liệu");
-            System.out.println("[7] Trả tài liệu");
-            //System.out.println("[9] Display User Info");
+            System.out.println("[6] Thêm người dùng");
+            System.out.println("[7] Mượn tài liệu");
+            System.out.println("[8] Trả tài liệu");
+            System.out.println("[9] Xem danh sách người dùng");
             System.out.print("Chọn chức năng: ");
 
             if (scanner.hasNextInt()) {
@@ -30,7 +30,7 @@ public class Menu {
                 switch (choice) {
                     case 0:
                         System.out.println(">> Chương trình đã thoát");
-                        System.exit();
+                        System.exit(0);
                     case 1:
                         System.out.println(">> Thêm tài liệu");
                         library.addDocument();
@@ -52,12 +52,20 @@ public class Menu {
                         library.displayDocuments();
                         break;
                     case 6:
+                        System.out.println(">> Thêm người dùng");
+                        library.addUser();
+                        break;
+                    case 7:
                         System.out.println(">> Mượn tài liệu");
                         library.borrowDocument();
                         break;
-                    case 7:
+                    case 8:
                         System.out.println(">> Trả tài liệu");
                         library.returnDocument();
+                        break;
+                    case 9:
+                        System.out.println(">> Xem danh sách người dùng");
+                        library.displayUser();
                         break;
                 }
             } else {

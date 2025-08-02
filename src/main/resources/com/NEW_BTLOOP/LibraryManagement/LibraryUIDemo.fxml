@@ -8,7 +8,7 @@
     Đã cập nhật fx:controller để khớp với package và tên lớp
     chính xác: "com.NEW_BTLOOP.LibraryManagement.LibraryUIDemoController".
 -->
-<BorderPane fx:controller="com.NEW_BTLOOP.LibraryManagement.LibraryUIDemoController"
+<BorderPane fx:controller="com.NEW_BTLOOP.LibraryManagement.controller.LibraryUIDemoController"
             prefHeight="700.0" prefWidth="1200.0"
             xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/21">
 

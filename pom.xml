@@ -3,7 +3,6 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <!-- Cập nhật groupId để khớp với tên package trong code Java -->
     <groupId>com.NEW_BTLOOP.LibraryManagement</groupId>
     <artifactId>NEW_BTLOOP</artifactId>
     <version>1.0-SNAPSHOT</version>
@@ -16,6 +15,7 @@
     </properties>
 
     <dependencies>
+        <!-- Các dependencies của JavaFX. Maven sẽ tự động tải các JAR này. -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
@@ -26,19 +26,27 @@
             <artifactId>javafx-fxml</artifactId>
             <version>${javafx.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>${javafx.version}</version>
+            <classifier>win</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-media</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.openjfx</groupId>
-                <artifactId>javafx-maven-plugin</artifactId>
-                <version>0.0.8</version>
-                <configuration>
-                    <!-- Cập nhật mainClass để khớp hoàn toàn với package và class -->
-                    <mainClass>com.NEW_BTLOOP.LibraryManagement.LibraryUIDemo</mainClass>
-                </configuration>
-            </plugin>
+            <!-- Plugin biên dịch -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -46,6 +54,15 @@
                 <configuration>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
+                </configuration>
+            </plugin>
+            <!-- Plugin chạy ứng dụng JavaFX -->
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>0.0.8</version>
+                <configuration>
+                    <mainClass>com.NEW_BTLOOP.LibraryManagement.LibraryUIDemo</mainClass>
                 </configuration>
             </plugin>
         </plugins>

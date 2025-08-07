@@ -1,212 +1,390 @@
 package com.NEW_BTLOOP.LibraryManagement;
 
-
+import java.sql.*;
 import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.List;
+import java.util.Map;
 
 public class Library {
-    public static ArrayList<User> users = new ArrayList<>();
-    public static ArrayList<Book> books = new ArrayList<>();
-    public static ArrayList<Thesis> theses = new ArrayList<>();
-    private Scanner scanner = new Scanner(System.in);
 
-    // Chức năng 1: Thêm tài liệu
-    public void addDocument() {
-        System.out.println("Thêm loại tài liệu nào?");
-        System.out.println("1. Sách");
-        System.out.println("2. Luận văn");
-        int type = scanner.nextInt();
-        scanner.nextLine();
+    // Kết nối CSDL
 
-        if (type == 1) {
-            Book book = new Book();
-            book.addBook();
-            books.add(book);
-            System.out.println("Đã thêm sách thành công.");
-        } else if (type == 2) {
-            Thesis thesis = new Thesis();
-            thesis.addThesis();
-            theses.add(thesis);
-            System.out.println("Đã thêm luận văn thành công.");
-        } else {
-            System.out.println("Lựa chọn không hợp lệ.");
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/library";
+    private static final String USER = "root";
+    private static final String PASS = "root";
+
+    private Connection conn;
+
+    public Library() throws SQLException {
+        conn = DriverManager.getConnection(DB_URL, USER, PASS);
+    }
+
+    public void close() throws SQLException {
+        if (conn != null && !conn.isClosed()) {
+            conn.close();
         }
     }
 
-    // Chức năng 2: Xóa tài liệu
-    public void removeDocument() {
-        System.out.println("Nhập mã ID tài liệu cần xóa:");
-        String id = scanner.nextLine();
+    // Tự động tạo ID tài liệu
 
-        if (books.removeIf(book -> book.ID.equalsIgnoreCase(id)) ||
-                theses.removeIf(thesis -> thesis.ID.equalsIgnoreCase(id))) {
-            System.out.println("Đã xóa tài liệu có mã ID: " + id);
-        } else {
-            System.out.println("Không tìm thấy tài liệu.");
-        }
-    }
-
-    // Chức năng 3: Cập nhật tài liệu
-    public void updateDocument() {
-        System.out.println("Nhập mã ID tài liệu cần cập nhật:");
-        String id = scanner.nextLine();
-
-        for (Book book : books) {
-            if (book.ID.equalsIgnoreCase(id)) {
-                book.updateBook();
-                return;
-            }
-        }
-
-        for (Thesis thesis : theses) {
-            if (thesis.ID.equalsIgnoreCase(id)) {
-                thesis.updateThesis();
-                return;
-            }
-        }
-
-        System.out.println("Không tìm thấy tài liệu.");
-    }
-
-    // Chức năng 4: Tìm kiếm sách hoặc luận án
-    public void searchMenu() {
-        while (true) {
-            System.out.println("\n--- MENU TÌM KIẾM ---");
-            System.out.println("1. Tìm trong SÁCH");
-            System.out.println("2. Tìm trong LUẬN VĂN");
-            System.out.println("0. Quay lại");
-            System.out.print("Chọn loại tài liệu: ");
-            int choice = scanner.nextInt();
-            scanner.nextLine();
-
-            switch (choice) {
-                case 1:
-                    searchBookFields();
-                    break;
-                case 2:
-                    searchThesisFields();
-                    break;
-                case 0:
-                    return;
-                default:
-                    System.out.println("Lựa chọn không hợp lệ.");
+    private String generateNextID(String prefix, String tableName) throws SQLException {
+        String sql = "SELECT ID FROM " + tableName + " WHERE ID LIKE ? ORDER BY ID DESC LIMIT 1";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, prefix + "%");
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    String lastId = rs.getString("ID");
+                    int number = Integer.parseInt(lastId.substring(3));
+                    return String.format("%s%06d", prefix, number + 1);
+                } else {
+                    return prefix + "000001";
+                }
             }
         }
     }
-    // Tìm sách
-    private void searchBookFields() {
-        System.out.println("\nTìm kiếm SÁCH theo:");
-        System.out.println("1. Tiêu đề");
-        System.out.println("2. Tác giả");
-        System.out.println("3. Mã ID");
-        System.out.println("4. Mã ISBN");
-        System.out.print("Chọn tiêu chí: ");
-        int option = scanner.nextInt();
-        scanner.nextLine();
 
-        System.out.print("Nhập từ khóa: ");
-        String keyword = scanner.nextLine();
-
-        switch (option) {
-            case 1 -> Book.searchBooksByTitle(keyword);
-            case 2 -> Book.searchBooksByAuthor(keyword);
-            case 3 -> Book.searchBooksByID(keyword);
-            case 4 -> Book.searchBooksByISBN(keyword);
-            default -> System.out.println("Tiêu chí không hợp lệ.");
+    private boolean checkDocExists(String tableName, String id) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM " + tableName + " WHERE ID = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
         }
     }
 
-    private void searchThesisFields() {
-        System.out.println("\nTìm kiếm LUẬN VĂN theo:");
-        System.out.println("1. Tiêu đề");
-        System.out.println("2. Tác giả");
-        System.out.println("3. Mã ID");
-        System.out.println("4. Người hướng dẫn");
-        System.out.print("Chọn tiêu chí: ");
-        int option = scanner.nextInt();
-        scanner.nextLine();
-
-        System.out.print("Nhập từ khóa: ");
-        String keyword = scanner.nextLine();
-
-        switch (option) {
-            case 1 -> Thesis.searchThesesByTitle(keyword);
-            case 2 -> Thesis.searchThesesByAuthor(keyword);
-            case 3 -> Thesis.searchThesesByID(keyword);
-            case 4 -> Thesis.searchThesesBySupervisor(keyword);
-            default -> System.out.println("Tiêu chí không hợp lệ.");
+    // Thêm sách
+    public void addBook(Book book) throws SQLException {
+        String id = generateNextID("BOK", "book");
+        book.setId(id);
+        String sql = "INSERT INTO book (ID, ISBN, Title, Author, Publisher, Genre, Year, PageCount, Total, Available) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, book.getId());
+            stmt.setString(2, book.getISBN());
+            stmt.setString(3, book.getTitle());
+            stmt.setString(4, book.getAuthor());
+            stmt.setString(5, book.getPublisher());
+            stmt.setString(6, book.getGenre());
+            stmt.setInt(7, book.getYear());
+            stmt.setInt(8, book.getNumberOfPages());
+            stmt.setInt(9, book.getTotal());
+            stmt.setInt(10, book.getAvail());
+            stmt.executeUpdate();
         }
     }
 
-    // Chức năng 5: Hiển thị tất cả tài liệu
-    public void displayDocuments() {
-        System.out.println("--- DANH SÁCH SÁCH ---");
-        for (Book book : books) {
-            System.out.println(book.getInfo());
+    public void updateBook(Book book) throws SQLException {
+        if (!checkDocExists("book", book.getId())) {
+            throw new SQLException("Book ID not found: " + book.getId());
         }
-
-        System.out.println("--- DANH SÁCH LUẬN VĂN ---");
-        for (Thesis thesis : theses) {
-            System.out.println(thesis.getInfo());
+        String sql = "UPDATE book SET Title=?, Author=?, Total=?, Available=?, Publisher=?, NumberOfPages=?, Genre=?, Year=?, ISBN=? WHERE ID=?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, book.getTitle());
+            stmt.setString(2, book.getAuthor());
+            stmt.setInt(3, book.getTotal());
+            stmt.setInt(4, book.getAvail());
+            stmt.setString(5, book.getPublisher());
+            stmt.setInt(6, book.getNumberOfPages());
+            stmt.setString(7, book.getGenre());
+            stmt.setInt(8, book.getYear());
+            stmt.setString(9, book.getISBN());
+            stmt.setString(10, book.getId());
+            stmt.executeUpdate();
         }
     }
 
-    // Chức năng 7: Mượn tài liệu
-    public void borrowDocument() {
-        System.out.println("Nhập mã ID tài liệu muốn mượn:");
-        String id = scanner.nextLine();
+    public List<Book> listBooks() throws SQLException {
+        List<Book> books = new ArrayList<>();
+        String sql = "SELECT * FROM book";
+        try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                Book b = new Book();
+                b.setId(rs.getString("ID"));
+                b.setTitle(rs.getString("Title"));
+                b.setAuthor(rs.getString("Author"));
+                b.setTotal(rs.getInt("Total"));
+                b.setAvail(rs.getInt("Available"));
+                b.setPublisher(rs.getString("Publisher"));
+                b.setNumberOfPages(rs.getInt("NumberOfPages"));
+                b.setGenre(rs.getString("Genre"));
+                b.setYear(rs.getInt("Year"));
+                b.setISBN(rs.getString("ISBN"));
+                books.add(b);
+            }
+        }
+        return books;
+    }
 
-        for (Book book : books) {
-            if (book.ID.equalsIgnoreCase(id)) {
-                book.borrowDocument();
-                return;
+    public void addThesis(Thesis thesis) throws SQLException {
+        String id = generateNextID("THS", "thesis");
+        thesis.setId(id);
+
+        String sql = "INSERT INTO thesis (ID, Title, Author, Supervisor, Department, University, Total, Available) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, thesis.getId());
+            stmt.setString(2, thesis.getTitle());
+            stmt.setString(3, thesis.getAuthor());
+            stmt.setString(4, thesis.getSupervisor());
+            stmt.setString(5, thesis.getDepartment());
+            stmt.setString(6, thesis.getUniversity());
+            stmt.setInt(7, thesis.getTotal());
+            stmt.setInt(8, thesis.getAvail());
+            stmt.executeUpdate();
+        }
+    }
+
+    public void updateThesis(Thesis thesis) throws SQLException {
+        if (!checkDocExists("thesis", thesis.getId())) {
+            throw new SQLException("Thesis ID not found: " + thesis.getId());
+        }
+        String sql = "UPDATE thesis SET Title=?, Author=?, Total=?, Available=?, University=?, Year=? WHERE ID=?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, thesis.getTitle());
+            stmt.setString(2, thesis.getAuthor());
+            stmt.setInt(3, thesis.getTotal());
+            stmt.setInt(4, thesis.getAvail());
+            stmt.setString(5, thesis.getUniversity());
+            stmt.setInt(6, thesis.getYear());
+            stmt.setString(7, thesis.getId());
+            stmt.executeUpdate();
+        }
+    }
+
+    public List<Thesis> listTheses() throws SQLException {
+        List<Thesis> theses = new ArrayList<>();
+        String sql = "SELECT * FROM thesis";
+        try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                Thesis t = new Thesis();
+                t.setId(rs.getString("ID"));
+                t.setTitle(rs.getString("Title"));
+                t.setAuthor(rs.getString("Author"));
+                t.setSupervisor(rs.getString("Supervisor"));
+                t.setDepartment(rs.getString("Department"));
+                t.setTotal(rs.getInt("Total"));
+                t.setAvail(rs.getInt("Available"));
+                t.setUniversity(rs.getString("University"));
+                t.setYear(rs.getInt("Year"));
+                theses.add(t);
+            }
+        }
+        return theses;
+    }
+
+    public void updateAvail(String id, int newAvail) throws SQLException {
+        String table;
+        if (id.substring(0, 3) == "BOK") {
+            if (!checkDocExists("book", id)) {
+                throw new SQLException("Book ID not found: " + id);
+            }
+            table = "book";
+        }
+
+        else {
+            if (!checkDocExists("thesis", id)) {
+                throw new SQLException("Thesis ID not found: " + id);
+            }
+            table = "thesis";
+        }
+        String sql = "UPDATE " + table + " SET Available = ? WHERE ID = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, newAvail);
+            stmt.setString(2, id);
+            stmt.executeUpdate();
+        }
+    }
+
+    public void updateTotal(String id, int newTotal) throws SQLException {
+        String table;
+        if (id.substring(0, 3) == "BOK") {
+            if (!checkDocExists("book", id)) {
+                throw new SQLException("Book ID not found: " + id);
+            }
+            table = "book";
+        }
+
+        else {
+            if (!checkDocExists("thesis", id)) {
+                throw new SQLException("Thesis ID not found: " + id);
+            }
+            table = "thesis";
+        }
+        String sql = "UPDATE " + table + " SET Available = ? WHERE ID = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, newTotal);
+            stmt.setString(2, id);
+            stmt.executeUpdate();
+        }
+    }
+
+    public void deleteDoc(String id) throws SQLException {
+        String table;
+        if (id.substring(0, 3) == "BOK") {
+            if (!checkDocExists("book", id)) {
+                throw new SQLException("Book ID not found: " + id);
+            }
+            table = "book";
+        }
+
+        else {
+            if (!checkDocExists("thesis", id)) {
+                throw new SQLException("Thesis ID not found: " + id);
+            }
+            table = "thesis";
+        }
+
+        String sql = "DELETE FROM " + table + " WHERE ID = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, id);
+            stmt.executeUpdate();
+        }
+    }
+
+    public List<Document> searchBookByCriteria(Map<String, String> criteria) throws SQLException {
+        List<Document> results = new ArrayList<>();
+        StringBuilder bookQuery = new StringBuilder("SELECT * FROM book WHERE 1=1");
+        List<Object> bookValues = new ArrayList<>();
+
+        for (Map.Entry<String, String> entry : criteria.entrySet()) {
+            String key = entry.getKey().toLowerCase();
+            String value = entry.getValue();
+            switch (key) {
+                case "id", "title", "author", "genre", "isbn" -> {
+                    bookQuery.append(" AND ").append(key).append(" LIKE ?");
+                    bookValues.add("%" + value + "%");
+                }
+                case "year", "total", "available", "numberofpages" -> {
+                    bookQuery.append(" AND ").append(key).append(" = ?");
+                    bookValues.add(Integer.parseInt(value));
+                }
             }
         }
 
-        for (Thesis thesis : theses) {
-            if (thesis.ID.equalsIgnoreCase(id)) {
-                thesis.borrowDocument();
-                return;
+        try (PreparedStatement stmt = conn.prepareStatement(bookQuery.toString())) {
+            for (int i = 0; i < bookValues.size(); i++) {
+                stmt.setObject(i + 1, bookValues.get(i));
+            }
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Book b = new Book();
+                    b.setId(rs.getString("ID"));
+                    b.setTitle(rs.getString("Title"));
+                    b.setAuthor(rs.getString("Author"));
+                    b.setTotal(rs.getInt("Total"));
+                    b.setAvail(rs.getInt("Available"));
+                    b.setPublisher(rs.getString("Publisher"));
+                    b.setNumberOfPages(rs.getInt("NumberOfPages"));
+                    b.setGenre(rs.getString("Genre"));
+                    b.setYear(rs.getInt("Year"));
+                    b.setISBN(rs.getString("ISBN"));
+                    results.add(b);
+                }
+            }
+
+        }
+        return results;
+    }
+
+    // Tìm luận án
+    public List<Document> searchThesesByCriteria(Map<String, String> criteria) throws SQLException {
+        List<Document> results = new ArrayList<>();
+        StringBuilder thesisQuery = new StringBuilder("SELECT * FROM thesis WHERE 1=1");
+        List<Object> thesisValues = new ArrayList<>();
+
+        for (Map.Entry<String, String> entry : criteria.entrySet()) {
+            String key = entry.getKey().toLowerCase();
+            String value = entry.getValue();
+            switch (key) {
+                case "id", "title", "author", "university" -> {
+                    thesisQuery.append(" AND ").append(key).append(" LIKE ?");
+                    thesisValues.add("%" + value + "%");
+                }
+                case "year", "total", "available" -> {
+                    thesisQuery.append(" AND ").append(key).append(" = ?");
+                    thesisValues.add(Integer.parseInt(value));
+                }
             }
         }
 
-        System.out.println("Không tìm thấy tài liệu.");
-    }
-
-    // Chức năng 8: Trả tài liệu
-    public void returnDocument() {
-        System.out.println("Nhập mã ID tài liệu muốn trả:");
-        String id = scanner.nextLine();
-
-        for (Book book : books) {
-            if (book.ID.equalsIgnoreCase(id)) {
-                book.returnDocument();
-                return;
+        try (PreparedStatement stmt = conn.prepareStatement(thesisQuery.toString())) {
+            for (int i = 0; i < thesisValues.size(); i++) {
+                stmt.setObject(i + 1, thesisValues.get(i));
+            }
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Thesis t = new Thesis();
+                    t.setId(rs.getString("ID"));
+                    t.setTitle(rs.getString("Title"));
+                    t.setAuthor(rs.getString("Author"));
+                    t.setTotal(rs.getInt("Total"));
+                    t.setAvail(rs.getInt("Available"));
+                    t.setUniversity(rs.getString("University"));
+                    t.setYear(rs.getInt("Year"));
+                    results.add(t);
+                }
             }
         }
 
-        for (Thesis thesis : theses) {
-            if (thesis.ID.equalsIgnoreCase(id)) {
-                thesis.returnDocument();
-                return;
+        return results;
+    }
+
+    public void insertUser(User user) throws SQLException {
+        String sql = "INSERT INTO user (UserID, Name, Email, BorrowedDoc, BorrowedLimit) VALUES (?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, user.getUserID());
+            stmt.setString(2, user.getName());
+            stmt.setString(3, user.getEmail());
+            stmt.setInt(4, user.getBorrowedDocuments());
+            stmt.setInt(5, user.getBorrowedLimit());
+            stmt.executeUpdate();
+        }
+    }
+
+    public List<User> listUsers() throws SQLException {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT * FROM user";
+        try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                User user = new User();
+                user.setUserID(rs.getString("UserID"));
+                user.setName(rs.getString("Name"));
+                user.setEmail(rs.getString("Email"));
+                user.setBorrowedDocuments(rs.getInt("BorrowedDoc"));
+                user.setBorrowedLimit(rs.getInt("BorrowenLimit"));
+                users.add(user);
             }
         }
-
-        System.out.println("Không tìm thấy tài liệu.");
-    }
-    
-     // Chức năng 9: Thêm người dùng
-    public void addUser() {
-        User user = new User();
-        users.add(user);
-        System.out.println("Đã thêm người dùng.");
+        return users;
     }
 
-    // Chức năng 10: Hiển thị người dùng
-    public void displayUser() {
-        System.out.println("--- DANH SÁCH NGƯỜI DÙNG ---");
-        for (User user : users) {
-            System.out.println(user.getInfo());
+    private boolean checkUserExists(String tableName, String id) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM " + tableName + " WHERE UserID = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
+        }
+    }
+
+    public void updateBorrowedDocuments(String userId, int newCount) throws SQLException {
+        String sql = "UPDATE user SET BorrowedDoc = ? WHERE UserID = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, newCount);
+            stmt.setString(2, userId);
+            stmt.executeUpdate();
+        }
+    }
+
+    public void deleteUser(String userId) throws SQLException {
+        if (!checkUserExists("user", userId)) {
+                throw new SQLException("User ID not found: " + userId);
+            }
+        String sql = "DELETE FROM user WHERE UserID = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, userId);
+            stmt.executeUpdate();
         }
     }
 }

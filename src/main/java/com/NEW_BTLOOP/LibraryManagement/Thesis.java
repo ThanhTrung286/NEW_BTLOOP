@@ -1,4 +1,4 @@
-package com.btloop;
+package com.NEW_BTLOOP.LibraryManagement;
 
 public class Thesis extends Document {
     public String supervisor; // Người hướng dẫn

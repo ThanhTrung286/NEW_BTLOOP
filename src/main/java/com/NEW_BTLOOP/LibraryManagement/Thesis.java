@@ -1,5 +1,4 @@
-package com.NEW_BTLOOP.LibraryManagement;
-
+package com.btloop;
 
 public class Thesis extends Document {
     public String supervisor; // Người hướng dẫn
@@ -86,6 +85,7 @@ public class Thesis extends Document {
      * @param None
      * @return void
      */
+    
     public void updateThesis() {
         updateDocument(); // Gọi phương thức updateDocument() để cập nhật thông tin chung
 
@@ -102,7 +102,7 @@ public class Thesis extends Document {
         this.year = read.nextInt();
         read.nextLine(); // Đọc ký tự newline còn lại sau nextInt()
     }
-
+    /* 
     public static void searchThesesByTitle(String keyword) {
         System.out.println(">> KẾT QUẢ LUẬN VĂN THEO TIÊU ĐỀ:");
         for (Thesis thesis : Library.theses) {
@@ -138,7 +138,7 @@ public class Thesis extends Document {
             }
         }
     }
-
+    */
     /**
      * Hiển thị thông tin luận văn. Chức năng 5
      * 

@@ -1,5 +1,4 @@
-package com.NEW_BTLOOP.LibraryManagement;
-
+package com.btloop;
 
 public class Book extends Document {
     public String publisher; // Nhà xuất bản
@@ -113,7 +112,8 @@ public class Book extends Document {
         this.genre = read.nextLine();
     }
     //Tìm sách
-    //Bằng tên
+    //Bằng tên 
+    /**
     public static void searchBooksByTitle(String keyword) {
         System.out.println(">> KẾT QUẢ SÁCH THEO TIÊU ĐỀ:");
         for (Book book : Library.books) {

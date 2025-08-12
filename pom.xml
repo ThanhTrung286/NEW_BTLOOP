@@ -15,7 +15,6 @@
     </properties>
 
     <dependencies>
-        <!-- Các dependencies của JavaFX. Maven sẽ tự động tải các JAR này. -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
@@ -42,11 +41,16 @@
             <artifactId>javafx-web</artifactId>
             <version>${javafx.version}</version>
         </dependency>
+        
+        <dependency>
+             <groupId>mysql</groupId>
+             <artifactId>mysql-connector-java</artifactId>
+             <version>8.0.20</version>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <!-- Plugin biên dịch -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -56,7 +60,6 @@
                     <target>${maven.compiler.target}</target>
                 </configuration>
             </plugin>
-            <!-- Plugin chạy ứng dụng JavaFX -->
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
@@ -67,9 +70,4 @@
             </plugin>
         </plugins>
     </build>
-         <dependency>
-             <groupId>mysql</groupId>
-             <artifactId>mysql-connector-java</artifactId>
-             <version>8.0.20</version>
-         </dependency>
 </project>

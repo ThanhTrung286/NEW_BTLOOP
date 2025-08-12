@@ -11,7 +11,7 @@ public class Library {
 
     private static final String DB_URL = "jdbc:mysql://localhost:3306/library";
     private static final String USER = "root";
-    private static final String PASS = "root";
+    private static final String PASS = "matkhau_moi_cua_ban";
 
     private Connection conn;
 
@@ -57,7 +57,7 @@ public class Library {
     public void addBook(Book book) throws SQLException {
         String id = generateNextID("BOK", "book");
         book.setId(id);
-        String sql = "INSERT INTO book (ID, ISBN, Title, Author, Publisher, Genre, Year, PageCount, Total, Available) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO book (ID, ISBN, Title, Author, Publisher, Genre, Year, NumberOfPages, Total, Available) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, book.getId());
             stmt.setString(2, book.getISBN());
@@ -71,6 +71,31 @@ public class Library {
             stmt.setInt(10, book.getAvail());
             stmt.executeUpdate();
         }
+    }
+
+    
+    public Book getBookByID(String id) throws SQLException {
+        String sql = "SELECT * FROM book WHERE ID = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Book b = new Book();
+                    b.setId(rs.getString("ID"));
+                    b.setISBN(rs.getString("ISBN"));
+                    b.setTitle(rs.getString("Title"));
+                    b.setAuthor(rs.getString("Author"));
+                    b.setPublisher(rs.getString("Publisher"));
+                    b.setGenre(rs.getString("Genre"));
+                    b.setYear(rs.getInt("Year"));
+                    b.setNumberOfPages(rs.getInt("NumberOfPages"));
+                    b.setTotal(rs.getInt("Total"));
+                    b.setAvail(rs.getInt("Available"));
+                    return b;
+                }
+            }
+        }
+        return null; // Trả về null nếu không tìm thấy sách
     }
 
     public void updateBook(Book book) throws SQLException {
@@ -119,8 +144,8 @@ public class Library {
         String id = generateNextID("THS", "thesis");
         thesis.setId(id);
 
-        String sql = "INSERT INTO thesis (ID, Title, Author, Supervisor, Department, University, Total, Available) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO thesis (ID, Title, Author, Supervisor, Department, University, Year, Total, Available) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, thesis.getId());
             stmt.setString(2, thesis.getTitle());
@@ -128,8 +153,9 @@ public class Library {
             stmt.setString(4, thesis.getSupervisor());
             stmt.setString(5, thesis.getDepartment());
             stmt.setString(6, thesis.getUniversity());
-            stmt.setInt(7, thesis.getTotal());
-            stmt.setInt(8, thesis.getAvail());
+            stmt.setInt(7, thesis.getYear());
+            stmt.setInt(8, thesis.getTotal());
+            stmt.setInt(9, thesis.getAvail());
             stmt.executeUpdate();
         }
     }
@@ -220,20 +246,22 @@ public class Library {
 
     public void deleteDoc(String id) throws SQLException {
         String table;
-        if (id.substring(0, 3) == "BOK") {
+    // Sửa lỗi: Sử dụng .equals() để so sánh chuỗi
+        if (id.substring(0, 3).equals("BOK")) {
             if (!checkDocExists("book", id)) {
                 throw new SQLException("Book ID not found: " + id);
             }
             table = "book";
         }
-
-        else {
+        else if (id.substring(0, 3).equals("THS")) {
             if (!checkDocExists("thesis", id)) {
                 throw new SQLException("Thesis ID not found: " + id);
             }
             table = "thesis";
+        } else {
+            throw new SQLException("Invalid document ID prefix: " + id);
         }
-
+    
         String sql = "DELETE FROM " + table + " WHERE ID = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id);

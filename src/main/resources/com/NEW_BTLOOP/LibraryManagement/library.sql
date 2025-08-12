@@ -31,11 +31,16 @@ CREATE TABLE `book` (
   `Publisher` varchar(30) DEFAULT NULL,
   `Genre` varchar(20) DEFAULT NULL,
   `Year` year(4) DEFAULT NULL,
-  `PageCount` int(11) DEFAULT NULL,
+  `NumberOfPages` int(11) DEFAULT NULL,
   `Total` int(11) NOT NULL,
   `Available` int(11) NOT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+insert into book(ID,ISBN,Title,Author,Publisher,Genre,Year,NumberOfPages,Total,Available) Values
+('B001', '9780140449136', 'The Odyssey', 'Homer', 'Penguin Classics', 'Epic', 1996, 560, 5, 5),
+('B002', '9780747532743', 'Harry Potter and the Philosopher''s Stone', 'J.K. Rowling', 'Bloomsbury', 'Fantasy', 1997, 223, 10, 8),
+('B003', '9780061120084', 'To Kill a Mockingbird', 'Harper Lee', 'Harper Perennial', 'Fiction', 2006, 336, 7, 7);
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -64,8 +69,10 @@ CREATE TABLE `thesis` (
   `Department` varchar(127) DEFAULT NULL,
   `University` varchar(90) NOT NULL,
   `Year` year(4) NOT NULL,
+  `Total` int(11) NOT NULL,
+  `Available` int(11) NOT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -93,7 +100,7 @@ CREATE TABLE `user` (
   `BorrowedDoc` int(11) NOT NULL,
   `BorrowedLimit` int(11) NOT NULL,
   PRIMARY KEY (`UserID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --

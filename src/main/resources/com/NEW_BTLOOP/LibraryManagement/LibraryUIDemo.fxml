@@ -1,62 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
 <!-- 
     Đã cập nhật fx:controller để khớp với package và tên lớp
     chính xác: "com.NEW_BTLOOP.LibraryManagement.LibraryUIDemoController".
 -->
-<BorderPane fx:controller="com.NEW_BTLOOP.LibraryManagement.controller.LibraryUIDemoController"
-            prefHeight="700.0" prefWidth="1200.0"
-            xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/21">
+
+<BorderPane prefHeight="700.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.NEW_BTLOOP.LibraryManagement.controller.LibraryUIDemoController">
 
     <top>
         <HBox alignment="CENTER_LEFT" spacing="20" style="-fx-background-color: #2c3e50; -fx-padding: 15;" BorderPane.alignment="CENTER">
             <children>
-                <Label text="LIBLOGO" textFill="WHITE">
-                    <font>
-                        <Font name="System Bold" size="24.0" />
-                    </font>
-                </Label>
                 <Label text="HỆ THỐNG QUẢN LÝ THƯ VIỆN" textFill="WHITE">
                     <font>
                         <Font name="System Bold" size="20.0" />
                     </font>
                 </Label>
                 <HBox alignment="CENTER_LEFT" spacing="5" HBox.hgrow="ALWAYS">
-                    <TextField fx:id="searchField" promptText="Tìm kiếm sách, tác giả..." prefWidth="300.0" style="-fx-background-color: #3e5163; -fx-text-fill: white; -fx-prompt-text-fill: #b0b0b0; -fx-font-size: 14px; -fx-padding: 8 10; -fx-border-radius: 5; -fx-background-radius: 5;" />
-                    <Button fx:id="searchButton" text="Tìm kiếm" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 10;" />
+                    <TextField fx:id="searchField" prefWidth="300.0" promptText="Tìm kiếm sách" style="-fx-background-color: #3e5163; -fx-text-fill: white; -fx-prompt-text-fill: #b0b0b0; -fx-font-size: 14px; -fx-padding: 8 10; -fx-border-radius: 5; -fx-background-radius: 5;" />
+                    <Button fx:id="searchButton" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 10;" text="Tìm kiếm" />
                 </HBox>
+            <Button fx:id="searchButton1" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 10;" text=" Tìm kiếm nâng cao" />
 
                 <Region HBox.hgrow="ALWAYS" />
-                <Button text="Thông báo (3)" style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15;" />
-                <Label text="17:23 PM" textFill="WHITE">
-                    <font><Font size="14.0" /></font>
-                    <HBox.margin>
-                        <Insets right="10.0"/>
-                    </HBox.margin>
-                </Label>
+                <Button style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15;" text="Thông báo (3)" />
 
-                <Button fx:id="btnAccount" text="Tài khoản" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15;" />
-                <Button fx:id="btnSettings" text="Cài đặt" style="-fx-background-color: #7f8c8d; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15;" />
+                <Button fx:id="btnAccount" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15;" text="Tài khoản" />
+                <Button fx:id="btnSettings" style="-fx-background-color: #7f8c8d; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15;" text="Cài đặt" />
             </children>
         </HBox>
     </top>
 
     <left>
-        <VBox alignment="TOP_LEFT" spacing="15.0" style="-fx-background-color: #34495e; -fx-padding: 20 10;" prefWidth="200.0" BorderPane.alignment="TOP_LEFT">
+        <VBox alignment="TOP_LEFT" prefWidth="200.0" spacing="15.0" style="-fx-background-color: #34495e; -fx-padding: 20 10;" BorderPane.alignment="TOP_LEFT">
             <children>
-                <Button fx:id="btnDashboard" maxWidth="1.7976931348623157E308" text=" Dashboard" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 0 10 10; -fx-alignment: CENTER_LEFT;" />
-                <Button fx:id="btnDocumentsList" maxWidth="1.7976931348623157E308" text=" Danh sách tài liệu" style="-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 0 10 10; -fx-alignment: CENTER_LEFT;" />
-                <Button fx:id="btnLoanManagement" maxWidth="1.7976931348623157E308" text=" Quản lý mượn trả" style="-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 0 10 10; -fx-alignment: CENTER_LEFT;" />
-                <Button fx:id="btnReadersManagement" maxWidth="1.7976931348623157E308" text=" Quản lý người đọc" style="-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 0 10 10; -fx-alignment: CENTER_LEFT;" />
+                <Button fx:id="btnDashboard" maxWidth="1.7976931348623157E308" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 0 10 10; -fx-alignment: CENTER_LEFT;" text=" Dashboard" />
+                <Button fx:id="btnDocumentsList" maxWidth="1.7976931348623157E308" style="-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 0 10 10; -fx-alignment: CENTER_LEFT;" text=" Danh sách tài liệu" />
+                <Button fx:id="btnLoanManagement" maxWidth="1.7976931348623157E308" style="-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 0 10 10; -fx-alignment: CENTER_LEFT;" text=" Quản lý mượn trả" />
+                <Button fx:id="btnReadersManagement" maxWidth="1.7976931348623157E308" style="-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 0 10 10; -fx-alignment: CENTER_LEFT;" text=" Quản lý người đọc" />
 
                 <Region VBox.vgrow="ALWAYS" />
                 <Separator prefWidth="200.0" style="-fx-background-color: #55606d;">
                     <VBox.margin>
-                        <Insets top="10.0" bottom="10.0"/>
+                        <Insets bottom="10.0" top="10.0" />
                     </VBox.margin>
                 </Separator>
                 <VBox alignment="TOP_LEFT" spacing="5" style="-fx-padding: 0 10 0 10;">
@@ -68,8 +68,8 @@
                     </Label>
                 </VBox>
                 <VBox alignment="TOP_LEFT" spacing="5" style="-fx-padding: 10 10 0 10;">
-                    <Hyperlink text="Báo cáo lỗi" style="-fx-text-fill: #3498db; -fx-font-weight: bold;" />
-                    <Hyperlink text="Trợ giúp &amp; Hỗ trợ" style="-fx-text-fill: #3498db; -fx-font-weight: bold;" />
+                    <Hyperlink style="-fx-text-fill: #3498db; -fx-font-weight: bold;" text="Báo cáo lỗi" />
+                    <Hyperlink style="-fx-text-fill: #3498db; -fx-font-weight: bold;" text="Trợ giúp &amp; Hỗ trợ" />
                 </VBox>
             </children>
         </VBox>
@@ -80,76 +80,76 @@
 
             <VBox fx:id="dashboardView" spacing="15.0">
                 <children>
-                    <Label text="Sách được tìm đọc nhiều (Dashboard)" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;">
+                    <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="Sách được tìm đọc nhiều (Dashboard)">
                         <VBox.margin>
                             <Insets bottom="10.0" />
                         </VBox.margin>
                     </Label>
-                    <FlowPane hgap="15.0" vgap="15.0" fx:id="bookPaneDashboard">
+                    <FlowPane fx:id="bookPaneDashboard" hgap="15.0" vgap="15.0">
                         </FlowPane>
                 </children>
             </VBox>
 
-            <VBox fx:id="documentsListView" spacing="10.0" visible="false" managed="false" style="-fx-background-color: #ffffff; -fx-padding: 15; -fx-border-radius: 8; -fx-background-radius: 8;">
-                <Label text="Danh Sách Tài Liệu" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
-             <HBox spacing="10" alignment="CENTER_LEFT">
-                <Button fx:id="btnAddDocument" text="Thêm Tài Liệu" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15;" />
-                <Button fx:id="btnEditDocument" text="Sửa Tài Liệu" style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15;" />
-                <Button fx:id="btnDeleteDocument" text="Xóa Tài Liệu" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15;" />
+            <VBox fx:id="documentsListView" managed="false" spacing="10.0" style="-fx-background-color: #ffffff; -fx-padding: 15; -fx-border-radius: 8; -fx-background-radius: 8;" visible="false">
+                <Label style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="Danh Sách Tài Liệu" />
+             <HBox alignment="CENTER_LEFT" spacing="10">
+                <Button fx:id="btnAddDocument" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15;" text="Thêm Tài Liệu" />
+                <Button fx:id="btnEditDocument" style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15;" text="Sửa Tài Liệu" />
+                <Button fx:id="btnDeleteDocument" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15;" text="Xóa Tài Liệu" />
                 <Region HBox.hgrow="ALWAYS" />
-                <TextField fx:id="documentFilterField" promptText="Lọc theo tên, tác giả..." style="-fx-pref-width: 250px; -fx-padding: 5;"/>
+                <TextField fx:id="documentFilterField" promptText="Lọc theo tên, tác giả..." style="-fx-pref-width: 250px; -fx-padding: 5;" />
             </HBox>
                 <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
-                    <FlowPane fx:id="documentCardsPane" hgap="15.0" vgap="15.0" style="-fx-padding: 10;">
+                    <FlowPane fx:id="documentCardsPane" hgap="15.0" style="-fx-padding: 10;" vgap="15.0">
                         </FlowPane>
                 </ScrollPane>
             </VBox>
 
-            <VBox fx:id="documentDetailView" spacing="10.0" visible="false" managed="false" style="-fx-background-color: #ffffff; -fx-padding: 20; -fx-border-radius: 8; -fx-background-radius: 8;">
-                <Label text="Thông Tin Chi Tiết Tài Liệu" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
-                <Label fx:id="detailBookCoverPlaceholder" text="[Placeholder cho Bìa Sách]" style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-pref-height: 200; -fx-pref-width: 130; -fx-alignment: CENTER; -fx-border-color: #cccccc;" />
-                <Label text="Tên: " fx:id="detailTitle" />
-                <Label text="Tác giả: " fx:id="detailAuthor" />
-                <Label text="Thể loại: " fx:id="detailCategory" />
-                <Label text="Mô tả: " fx:id="detailDescription" wrapText="true" />
+            <VBox fx:id="documentDetailView" managed="false" spacing="10.0" style="-fx-background-color: #ffffff; -fx-padding: 20; -fx-border-radius: 8; -fx-background-radius: 8;" visible="false">
+                <Label style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="Thông Tin Chi Tiết Tài Liệu" />
+                <Label fx:id="detailBookCoverPlaceholder" style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-pref-height: 200; -fx-pref-width: 130; -fx-alignment: CENTER; -fx-border-color: #cccccc;" text="[Placeholder cho Bìa Sách]" />
+                <Label fx:id="detailTitle" text="Tên: " />
+                <Label fx:id="detailAuthor" text="Tác giả: " />
+                <Label fx:id="detailCategory" text="Thể loại: " />
+                <Label fx:id="detailDescription" text="Mô tả: " wrapText="true" />
                 <HBox spacing="10">
-                    <Button text="Mượn Sách" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 8 15;" />
-                    <Button fx:id="btnBackToDocuments" text="Quay Lại Danh Sách" style="-fx-background-color: #7f8c8d; -fx-text-fill: white; -fx-padding: 8 15;" />
+                    <Button style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 8 15;" text="Mượn Sách" />
+                    <Button fx:id="btnBackToDocuments" style="-fx-background-color: #7f8c8d; -fx-text-fill: white; -fx-padding: 8 15;" text="Quay Lại Danh Sách" />
                 </HBox>
             </VBox>
 
-            <VBox fx:id="loanReturnView" spacing="10.0" visible="false" managed="false" style="-fx-background-color: #ffffff; -fx-padding: 20; -fx-border-radius: 8; -fx-background-radius: 8;">
-                <Label text="Quản Lý Mượn/Trả Tài Liệu" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
-                <HBox spacing="15" alignment="CENTER_LEFT">
+            <VBox fx:id="loanReturnView" managed="false" spacing="10.0" style="-fx-background-color: #ffffff; -fx-padding: 20; -fx-border-radius: 8; -fx-background-radius: 8;" visible="false">
+                <Label style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="Quản Lý Mượn/Trả Tài Liệu" />
+                <HBox alignment="CENTER_LEFT" spacing="15">
                     <VBox spacing="5">
                         <Label text="ID Thành viên:" />
                         <TextField promptText="Nhập ID thành viên" />
-                        <Button text="Tìm Thành viên" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 8 15;" />
+                        <Button style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 8 15;" text="Tìm Thành viên" />
                     </VBox>
                     <VBox spacing="5">
                         <Label text="ID Tài liệu:" />
                         <TextField promptText="Nhập ID tài liệu" />
-                        <Button text="Tìm Tài liệu" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 8 15;" />
+                        <Button style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 8 15;" text="Tìm Tài liệu" />
                     </VBox>
                     <Region HBox.hgrow="ALWAYS" />
                 </HBox>
                 <HBox spacing="10">
-                    <Button text="Cho Mượn" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-padding: 10 20;" />
-                    <Button text="Trả Tài Liệu" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-padding: 10 20;" />
+                    <Button style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-padding: 10 20;" text="Cho Mượn" />
+                    <Button style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-padding: 10 20;" text="Trả Tài Liệu" />
                 </HBox>
-                <Label text="[Bảng TableView cho Lịch sử Mượn/Trả sẽ ở đây]" style="-fx-text-fill: #7f8c8d; -fx-font-size: 14px; -fx-pref-height: 200; -fx-alignment: CENTER; -fx-border-color: #cccccc; -fx-border-style: dashed;" VBox.vgrow="ALWAYS" />
+                <Label style="-fx-text-fill: #7f8c8d; -fx-font-size: 14px; -fx-pref-height: 200; -fx-alignment: CENTER; -fx-border-color: #cccccc; -fx-border-style: dashed;" text="[Bảng TableView cho Lịch sử Mượn/Trả sẽ ở đây]" VBox.vgrow="ALWAYS" />
             </VBox>
 
-            <VBox fx:id="readersManagementView" spacing="10.0" visible="false" managed="false" style="-fx-background-color: #ffffff; -fx-padding: 15; -fx-border-radius: 8; -fx-background-radius: 8;">
-                <Label text="Quản Lý Người Đọc" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
-                <HBox spacing="10" alignment="CENTER_LEFT">
-                    <Button text="Thêm Người Đọc" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15;" />
-                    <Button text="Sửa Thông Tin" style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15;" />
-                    <Button text="Xóa Người Đọc" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15;" />
+            <VBox fx:id="readersManagementView" managed="false" spacing="10.0" style="-fx-background-color: #ffffff; -fx-padding: 15; -fx-border-radius: 8; -fx-background-radius: 8;" visible="false">
+                <Label style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="Quản Lý Người Đọc" />
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Button style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15;" text="Thêm Người Đọc" />
+                    <Button style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15;" text="Sửa Thông Tin" />
+                    <Button style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15;" text="Xóa Người Đọc" />
                     <Region HBox.hgrow="ALWAYS" />
-                    <TextField promptText="Lọc theo tên, ID..." style="-fx-pref-width: 250px; -fx-padding: 5;"/>
+                    <TextField promptText="Lọc theo tên, ID..." style="-fx-pref-width: 250px; -fx-padding: 5;" />
                 </HBox>
-                <Label text="[Bảng TableView cho Danh sách Người đọc sẽ ở đây]" style="-fx-text-fill: #7f8c8d; -fx-font-size: 14px; -fx-pref-height: 200; -fx-alignment: CENTER; -fx-border-color: #cccccc; -fx-border-style: dashed;" VBox.vgrow="ALWAYS" />
+                <Label style="-fx-text-fill: #7f8c8d; -fx-font-size: 14px; -fx-pref-height: 200; -fx-alignment: CENTER; -fx-border-color: #cccccc; -fx-border-style: dashed;" text="[Bảng TableView cho Danh sách Người đọc sẽ ở đây]" VBox.vgrow="ALWAYS" />
             </VBox>
         </StackPane>
     </center>

@@ -38,3 +38,5 @@ desktop.ini
 
 # Ignore test reports (optional)
 surefire-reports/
+
+library.session.sql

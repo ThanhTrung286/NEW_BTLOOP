@@ -1,9 +1,9 @@
 /*M!999999\- enable the sandbox mode */ 
--- MariaDB dump 10.19-11.8.2-MariaDB, for Linux (x86_64)
+-- MariaDB dump 10.19-11.8.3-MariaDB, for Linux (x86_64)
 --
 -- Host: localhost    Database: library
 -- ------------------------------------------------------
--- Server version	11.8.2-MariaDB
+-- Server version	11.8.3-MariaDB
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -25,22 +25,13 @@ DROP TABLE IF EXISTS `book`;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `book` (
   `ID` varchar(10) NOT NULL,
-  `ISBN` varchar(13) DEFAULT NULL,
-  `Title` varchar(255) DEFAULT NULL,
-  `Author` varchar(255) DEFAULT NULL,
-  `Publisher` varchar(30) DEFAULT NULL,
-  `Genre` varchar(20) DEFAULT NULL,
-  `Year` year(4) DEFAULT NULL,
+  `Publisher` varchar(255) DEFAULT NULL,
   `NumberOfPages` int(11) DEFAULT NULL,
-  `Total` int(11) NOT NULL,
-  `Available` int(11) NOT NULL,
-  PRIMARY KEY (`ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-insert into book(ID,ISBN,Title,Author,Publisher,Genre,Year,NumberOfPages,Total,Available) Values
-('B001', '9780140449136', 'The Odyssey', 'Homer', 'Penguin Classics', 'Epic', 1996, 560, 5, 5),
-('B002', '9780747532743', 'Harry Potter and the Philosopher''s Stone', 'J.K. Rowling', 'Bloomsbury', 'Fantasy', 1997, 223, 10, 8),
-('B003', '9780061120084', 'To Kill a Mockingbird', 'Harper Lee', 'Harper Perennial', 'Fiction', 2006, 336, 7, 7);
+  `Genre` varchar(100) DEFAULT NULL,
+  `ISBN` varchar(20) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  CONSTRAINT `book_ibfk_1` FOREIGN KEY (`ID`) REFERENCES `document` (`ID`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -50,7 +41,74 @@ insert into book(ID,ISBN,Title,Author,Publisher,Genre,Year,NumberOfPages,Total,A
 LOCK TABLES `book` WRITE;
 /*!40000 ALTER TABLE `book` DISABLE KEYS */;
 set autocommit=0;
+INSERT INTO `book` VALUES
+('BOK000001','NXB',0,'TL','9999999999999');
 /*!40000 ALTER TABLE `book` ENABLE KEYS */;
+UNLOCK TABLES;
+commit;
+
+--
+-- Table structure for table `borrow_record`
+--
+
+DROP TABLE IF EXISTS `borrow_record`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `borrow_record` (
+  `RecordID` int(11) NOT NULL AUTO_INCREMENT,
+  `UserID` varchar(10) NOT NULL,
+  `DocumentID` varchar(10) NOT NULL,
+  `BorrowDate` date NOT NULL,
+  `ExpectedReturnDate` date NOT NULL,
+  `ActualReturnDate` date DEFAULT NULL,
+  PRIMARY KEY (`RecordID`),
+  KEY `UserID` (`UserID`),
+  KEY `DocumentID` (`DocumentID`),
+  CONSTRAINT `borrow_record_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `user` (`UserID`) ON DELETE CASCADE,
+  CONSTRAINT `borrow_record_ibfk_2` FOREIGN KEY (`DocumentID`) REFERENCES `document` (`ID`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `borrow_record`
+--
+
+LOCK TABLES `borrow_record` WRITE;
+/*!40000 ALTER TABLE `borrow_record` DISABLE KEYS */;
+set autocommit=0;
+/*!40000 ALTER TABLE `borrow_record` ENABLE KEYS */;
+UNLOCK TABLES;
+commit;
+
+--
+-- Table structure for table `document`
+--
+
+DROP TABLE IF EXISTS `document`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `document` (
+  `ID` varchar(10) NOT NULL,
+  `Title` varchar(255) NOT NULL,
+  `Author` varchar(255) NOT NULL,
+  `Total` int(11) NOT NULL,
+  `Available` int(11) NOT NULL,
+  `Year` int(11) DEFAULT NULL,
+  `DocType` enum('BOOK','THESIS') NOT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `document`
+--
+
+LOCK TABLES `document` WRITE;
+/*!40000 ALTER TABLE `document` DISABLE KEYS */;
+set autocommit=0;
+INSERT INTO `document` VALUES
+('BOK000001','SACH','TAC GIA',0,0,0,'BOOK');
+/*!40000 ALTER TABLE `document` ENABLE KEYS */;
 UNLOCK TABLES;
 commit;
 
@@ -63,16 +121,12 @@ DROP TABLE IF EXISTS `thesis`;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `thesis` (
   `ID` varchar(10) NOT NULL,
-  `Title` varchar(255) DEFAULT NULL,
-  `Author` varchar(255) DEFAULT NULL,
   `Supervisor` varchar(127) DEFAULT NULL,
   `Department` varchar(127) DEFAULT NULL,
-  `University` varchar(90) NOT NULL,
-  `Year` year(4) NOT NULL,
-  `Total` int(11) NOT NULL,
-  `Available` int(11) NOT NULL,
-  PRIMARY KEY (`ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `University` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  CONSTRAINT `thesis_ibfk_1` FOREIGN KEY (`ID`) REFERENCES `document` (`ID`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -100,7 +154,7 @@ CREATE TABLE `user` (
   `BorrowedDoc` int(11) NOT NULL,
   `BorrowedLimit` int(11) NOT NULL,
   PRIMARY KEY (`UserID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -123,4 +177,4 @@ commit;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2025-08-11  7:26:52
+-- Dump completed on 2025-08-14 22:40:22

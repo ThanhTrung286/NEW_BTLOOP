@@ -4,6 +4,7 @@ import com.NEW_BTLOOP.LibraryManagement.Book;
 import com.NEW_BTLOOP.LibraryManagement.Document;
 import com.NEW_BTLOOP.LibraryManagement.Library;
 import com.NEW_BTLOOP.LibraryManagement.Thesis;
+
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -27,133 +28,158 @@ import java.util.Map;
 public class LibraryUIDemoController {
 
     // --- Khai báo các thành phần UI từ FXML ---
-    @FXML private Button btnAccount;
-    @FXML private Button btnSettings;
-    @FXML private TextField searchField;
-    @FXML private Button searchButton;
-    @FXML private Button btnDashboard;
-    @FXML private Button btnDocumentsList;
-    @FXML private Button btnLoanManagement;
-    @FXML private Button btnReadersManagement;
+    @FXML
+    private Button btnAccount;
+    @FXML
+    private Button btnSettings;
+    @FXML
+    private TextField searchField;
+    @FXML
+    private Button searchButton;
+    @FXML
+    private Button btnDashboard;
+    @FXML
+    private Button btnDocumentsList;
+    @FXML
+    private Button btnLoanManagement;
+    @FXML
+    private Button btnReadersManagement;
 
     // Các View chính
-    @FXML private StackPane contentArea;
-    @FXML private VBox dashboardView;
-    @FXML private FlowPane bookPaneDashboard;
+    @FXML
+    private StackPane contentArea;
+    @FXML
+    private VBox dashboardView;
+    @FXML
+    private FlowPane bookPaneDashboard;
 
-    @FXML private VBox documentsListView;
-    @FXML private FlowPane documentCardsPane;
-    @FXML private TextField documentFilterField;
+    @FXML
+    private VBox documentsListView;
+    @FXML
+    private FlowPane documentCardsPane;
+    @FXML
+    private TextField documentFilterField;
 
-    @FXML private VBox documentDetailView;
-    @FXML private Label detailBookCoverPlaceholder;
-    @FXML private Label detailTitle;
-    @FXML private Label detailAuthor;
-    @FXML private Label detailCategory;
-    @FXML private Label detailDescription;
-    @FXML private Button btnBackToDocuments;
+    @FXML
+    private VBox documentDetailView;
+    @FXML
+    private Label detailBookCoverPlaceholder;
+    @FXML
+    private Label detailTitle;
+    @FXML
+    private Label detailAuthor;
+    @FXML
+    private Label detailCategory;
+    @FXML
+    private Label detailDescription;
+    @FXML
+    private Button btnBackToDocuments;
 
-    @FXML private VBox loanReturnView;
-    @FXML private VBox readersManagementView;
+    @FXML
+    private VBox loanReturnView;
+    @FXML
+    private VBox readersManagementView;
 
-    @FXML private Button btnAddDocument;
-    @FXML private Button btnEditDocument;
-    @FXML private Button btnDeleteDocument;
-    
+    @FXML
+    private Button btnAddDocument;
+    @FXML
+    private Button btnEditDocument;
+    @FXML
+    private Button btnDeleteDocument;
+
     // Đối tượng Library để kết nối và thao tác với CSDL
     private Library libraryDB;
 
     @FXML
-public void initialize() {
-    System.out.println("Controller đã được khởi tạo và liên kết với FXML!");
+    public void initialize() {
+        System.out.println("Controller đã được khởi tạo và liên kết với FXML!");
 
-    boolean dbReady = false;
+        boolean dbReady = false;
 
-    try {
-        // Thử kết nối CSDL
-        libraryDB = new Library();
-        dbReady = true;
-        System.out.println("Kết nối CSDL thành công!");
-    } catch (SQLException e) {
-        System.err.println("❌ Lỗi khi kết nối CSDL: " + e.getMessage());
-        // Có thể gán Library giả để UI vẫn chạy
-        // libraryDB = new LibraryMock(); // Nếu có class giả lập
-    }
+        try {
+            // Thử kết nối CSDL
+            libraryDB = new Library();
+            dbReady = true;
+            System.out.println("Kết nối CSDL thành công!");
+        } catch (SQLException e) {
+            System.err.println("❌ Lỗi khi kết nối CSDL: " + e.getMessage());
+            // Có thể gán Library giả để UI vẫn chạy
+            // libraryDB = new LibraryMock(); // Nếu có class giả lập
+        }
 
-    // Nếu DB sẵn sàng mới load dữ liệu
-    if (dbReady) {
-        populateDashboardBooks();
-        showView(dashboardView);
-    } else {
-        System.err.println("⚠️ Không thể load dữ liệu Dashboard vì DB chưa sẵn sàng.");
-        // Hiển thị view dashboard trống hoặc view báo lỗi
-        showView(dashboardView);
-    }
-
-    // Thiết lập hành động cho các nút
-    if (btnDashboard != null) {
-        btnDashboard.setOnAction(event -> {
+        // Nếu DB sẵn sàng mới load dữ liệu
+        if (dbReady) {
+            populateDashboardBooks();
             showView(dashboardView);
-            if (libraryDB != null) {
-                populateDashboardBooks();
-            } else {
-                System.err.println("⚠️ Không thể load Dashboard vì libraryDB = null");
-            }
-        });
-    }
+        } else {
+            System.err.println("⚠️ Không thể load dữ liệu Dashboard vì DB chưa sẵn sàng.");
+            // Hiển thị view dashboard trống hoặc view báo lỗi
+            showView(dashboardView);
+        }
 
-    if (btnDocumentsList != null) {
-        btnDocumentsList.setOnAction(event -> {
-            showView(documentsListView);
-            if (libraryDB != null) {
-                populateAllDocumentCards();
-            } else {
-                System.err.println("⚠️ Không thể load danh sách tài liệu vì libraryDB = null");
-            }
-        });
-    }
+        // Thiết lập hành động cho các nút
+        if (btnDashboard != null) {
+            btnDashboard.setOnAction(event -> {
+                showView(dashboardView);
+                if (libraryDB != null) {
+                    populateDashboardBooks();
+                } else {
+                    System.err.println("⚠️ Không thể load Dashboard vì libraryDB = null");
+                }
+            });
+        }
 
-    if (btnLoanManagement != null) {
-        btnLoanManagement.setOnAction(event -> showView(loanReturnView));
-    }
+        if (btnDocumentsList != null) {
+            btnDocumentsList.setOnAction(event -> {
+                showView(documentsListView);
+                if (libraryDB != null) {
+                    populateAllDocumentCards();
+                } else {
+                    System.err.println("⚠️ Không thể load danh sách tài liệu vì libraryDB = null");
+                }
+            });
+        }
 
-    if (btnReadersManagement != null) {
-        btnReadersManagement.setOnAction(event -> showView(readersManagementView));
-    }
+        if (btnLoanManagement != null) {
+            btnLoanManagement.setOnAction(event -> showView(loanReturnView));
+        }
 
-    if (btnBackToDocuments != null) {
-        btnBackToDocuments.setOnAction(event -> {
-            showView(documentsListView);
-            if (libraryDB != null) {
-                populateAllDocumentCards();
-            }
-        });
-    }
+        if (btnReadersManagement != null) {
+            btnReadersManagement.setOnAction(event -> showView(readersManagementView));
+        }
 
-    if (searchButton != null) {
-        searchButton.setOnAction(event -> {
-            if (libraryDB != null) {
-                String searchText = searchField.getText();
-                performSearch(searchText);
-            } else {
-                System.err.println("⚠️ Không thể tìm kiếm vì libraryDB = null");
-            }
-        });
-    }
+        if (btnBackToDocuments != null) {
+            btnBackToDocuments.setOnAction(event -> {
+                showView(documentsListView);
+                if (libraryDB != null) {
+                    populateAllDocumentCards();
+                }
+            });
+        }
 
-    if (btnAddDocument != null) {
-        btnAddDocument.setOnAction(event -> handleAddDocument());
-    }
+        if (searchButton != null) {
+            searchButton.setOnAction(event -> {
+                if (libraryDB != null) {
+                    String searchText = searchField.getText();
+                    performSearch(searchText);
+                } else {
+                    System.err.println("⚠️ Không thể tìm kiếm vì libraryDB = null");
+                }
+            });
+        }
 
-    if (btnEditDocument != null) {
-        btnEditDocument.setOnAction(event -> handleEditDocument());
-    }
+        if (btnAddDocument != null) {
+            btnAddDocument.setOnAction(event -> handleAddDocument());
+        }
 
-    if (btnDeleteDocument != null) {
-        btnDeleteDocument.setOnAction(event -> handleDeleteDocument());
-    }
-}
+        if (btnEditDocument != null) {
+            btnEditDocument.setOnAction(event -> handleEditDocument());
+        }
 
+        if (btnDeleteDocument != null) {
+            btnDeleteDocument.setOnAction(event -> handleDeleteDocument());
+        }
+    }
 
     private void showView(Node viewToShow) {
         if (contentArea != null && contentArea.getChildren() != null) {
@@ -178,7 +204,7 @@ public void initialize() {
             bookPaneDashboard.getChildren().clear();
             try {
                 // Lấy danh sách sách từ CSDL
-                List<Book> books = libraryDB.listBooks(); 
+                List<Book> books = libraryDB.listBooks();
                 // Lấy 6 cuốn sách đầu tiên hoặc tất cả nếu ít hơn 6
                 for (int i = 0; i < Math.min(6, books.size()); i++) {
                     Book book = books.get(i);
@@ -210,7 +236,7 @@ public void initialize() {
                     documentCard.setOnMouseClicked(event -> showDocumentDetail(book));
                     documentCardsPane.getChildren().add(documentCard);
                 }
-                
+
                 // Thêm các thẻ luận văn
                 for (Thesis thesis : theses) {
                     VBox documentCard = createBookCard(thesis.getTitle(), "Tác giả: " + thesis.getAuthor());
@@ -235,23 +261,13 @@ public void initialize() {
         }
 
         try {
-            Map<String, String> criteria = new HashMap<>();
-            criteria.put("title", keyword);
-            criteria.put("author", keyword);
+            List<Document> foundDoc = libraryDB.generalSearch(keyword);
 
-            List<Document> foundBooks = libraryDB.searchBookByCriteria(criteria);
-            List<Document> foundTheses = libraryDB.searchThesesByCriteria(criteria);
-            
             // Xóa các thẻ cũ
             documentCardsPane.getChildren().clear();
 
             // Thêm kết quả tìm kiếm vào FlowPane
-            for (Document doc : foundBooks) {
-                VBox card = createBookCard(doc.getTitle(), "Tác giả: " + doc.getAuthor());
-                card.setOnMouseClicked(event -> showDocumentDetail(doc));
-                documentCardsPane.getChildren().add(card);
-            }
-            for (Document doc : foundTheses) {
+            for (Document doc : foundDoc) {
                 VBox card = createBookCard(doc.getTitle(), "Tác giả: " + doc.getAuthor());
                 card.setOnMouseClicked(event -> showDocumentDetail(doc));
                 documentCardsPane.getChildren().add(card);
@@ -268,12 +284,14 @@ public void initialize() {
         VBox card = new VBox(5);
         card.setPadding(new Insets(10));
         card.setAlignment(Pos.CENTER);
-        card.setStyle("-fx-border-color: #bdc3c7; -fx-background-color: #ffffff; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10; -fx-cursor: hand;");
+        card.setStyle(
+                "-fx-border-color: #bdc3c7; -fx-background-color: #ffffff; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10; -fx-cursor: hand;");
         card.setPrefWidth(140.0);
         card.setPrefHeight(200.0);
 
         Label coverPlaceholder = new Label("[Bìa]");
-        coverPlaceholder.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-pref-height: 120; -fx-pref-width: 90; -fx-alignment: CENTER; -fx-border-color: #cccccc; -fx-background-color: #f0f0f0;");
+        coverPlaceholder.setStyle(
+                "-fx-font-weight: bold; -fx-font-size: 14px; -fx-pref-height: 120; -fx-pref-width: 90; -fx-alignment: CENTER; -fx-border-color: #cccccc; -fx-background-color: #f0f0f0;");
         card.getChildren().add(coverPlaceholder);
 
         Label titleLabel = new Label(title);
@@ -302,33 +320,33 @@ public void initialize() {
 
             // Tạo chuỗi mô tả chung ban đầu
             String generalDescription = "ID: " + document.getId() + "\n" +
-                                        "Năm xuất bản: " + document.getYear() + "\n" +
-                                        "Số lượng có sẵn: " + document.getAvail() + "/" + document.getTotal();
+                    "Năm xuất bản: " + document.getYear() + "\n" +
+                    "Số lượng có sẵn: " + document.getAvail() + "/" + document.getTotal();
 
             // Cập nhật thông tin chi tiết riêng cho từng loại tài liệu
             if (document instanceof Book) {
                 Book book = (Book) document;
                 detailCategory.setText("Thể loại: " + book.getGenre());
                 detailDescription.setText(generalDescription + "\n" +
-                                         "Nhà xuất bản: " + book.getPublisher() + "\n" +
-                                         "Số trang: " + book.getNumberOfPages() + "\n" +
-                                         "ISBN: " + book.getISBN());
+                        "Nhà xuất bản: " + book.getPublisher() + "\n" +
+                        "Số trang: " + book.getNumberOfPages() + "\n" +
+                        "ISBN: " + book.getISBN());
             } else if (document instanceof Thesis) {
                 Thesis thesis = (Thesis) document;
                 detailCategory.setText("Loại: Luận văn");
                 detailDescription.setText(generalDescription + "\n" +
-                                         "Người hướng dẫn: " + thesis.getSupervisor() + "\n" +
-                                         "Trường: " + thesis.getUniversity() + "\n" +
-                                         "Khoa: " + thesis.getDepartment());
+                        "Người hướng dẫn: " + thesis.getSupervisor() + "\n" +
+                        "Trường: " + thesis.getUniversity() + "\n" +
+                        "Khoa: " + thesis.getDepartment());
             }
-            
+
             showView(documentDetailView);
         }
     }
 
     /**
-    * Xử lý thêm tài liệu mới.
-    */
+     * Xử lý thêm tài liệu mới.
+     */
     private void handleAddDocument() {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Thêm Tài Liệu Mới");
@@ -339,12 +357,12 @@ public void initialize() {
             try {
                 if ("1".equals(type.trim())) {
                     Book newBook = new Book();
-                // Tạm thời, tạo một sách mẫu
+                    // Tạm thời, tạo một sách mẫu
                     newBook.setTitle("Sách mới");
                     newBook.setAuthor("Tác giả mới");
                     newBook.setISBN("9999999999999");
                     libraryDB.addBook(newBook);
-                
+
                     System.out.println("Đã thêm sách thành công!");
                     populateAllDocumentCards(); // Cập nhật lại danh sách
                 } else if ("2".equals(type.trim())) {
@@ -373,12 +391,9 @@ public void initialize() {
         });
     }
 
-    
-
     /**
-    * Xử lý sửa tài liệu.
-    */
-    
+     * Xử lý sửa tài liệu.
+     */
 
     private void handleEditDocument() {
         TextInputDialog idDialog = new TextInputDialog();
@@ -389,14 +404,19 @@ public void initialize() {
         idDialog.showAndWait().ifPresent(id -> {
             try {
                 if (id.substring(0, 3).equals("BOK")) {
-                    Book book = libraryDB.getBookByID(id);
-                    if (book != null) {
+                    Document doc = libraryDB.getDocumentById(id);
+                    if (doc != null) {
                         // Mở một Dialog mới để sửa thông tin sách
-                        showEditBookDialog(book);
+                        if(doc instanceof Book)
+                        {
+                            Book book = (Book)doc;
+                            showEditBookDialog(book);
+                        }
+                        
                     } else {
                         showAlert("Lỗi", "Không tìm thấy sách với ID: " + id, Alert.AlertType.ERROR);
                     }
-                }  else {
+                } else {
                     showAlert("Lỗi", "ID tài liệu không hợp lệ.", Alert.AlertType.ERROR);
                 }
             } catch (SQLException e) {
@@ -407,7 +427,7 @@ public void initialize() {
         });
     }
 
-     // Thêm phương thức mới để tạo và hiển thị Dialog sửa thông tin sách
+    // Thêm phương thức mới để tạo và hiển thị Dialog sửa thông tin sách
     private void showEditBookDialog(Book book) {
         Dialog<Book> dialog = new Dialog<>();
         dialog.setTitle("Sửa thông tin sách");
@@ -420,14 +440,14 @@ public void initialize() {
         TextField GenreField = new TextField(book.getGenre());
 
         VBox content = new VBox(10, new Label("Tên sách:"), titleField,
-                                 new Label("Tác giả:"), authorField,
-                                 new Label("Nhà xuất bản:"), publisherField,
-                                 new Label("Thể loại:"), GenreField);
+                new Label("Tác giả:"), authorField,
+                new Label("Nhà xuất bản:"), publisherField,
+                new Label("Thể loại:"), GenreField);
         dialog.getDialogPane().setContent(content);
 
         // Thêm các nút OK và Cancel
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-    
+
         // Xử lý khi nhấn OK
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == ButtonType.OK) {
@@ -453,10 +473,9 @@ public void initialize() {
         });
     }
 
-
     /**
-    * Xử lý xóa tài liệu.
-    */
+     * Xử lý xóa tài liệu.
+     */
     private void handleDeleteDocument() {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Xóa Tài Liệu");

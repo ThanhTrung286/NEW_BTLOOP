@@ -1,6 +1,5 @@
 package com.NEW_BTLOOP.LibraryManagement;
 
-
 public class Teacher extends User {
     public String teacherID; // Mã giáo viên
     public String degree; // Bằng cấp

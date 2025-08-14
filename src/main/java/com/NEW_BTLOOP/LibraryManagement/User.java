@@ -1,14 +1,15 @@
 package com.NEW_BTLOOP.LibraryManagement;
 
-
+import java.util.List;
 import java.util.Scanner;
 
 public class User {
     public String name; // Tên người dùng
     public String email; // Email người dùng
     public String userID;
-public int borrowedDocuments = 0; // Số tài liệu đã mượn
+    public int borrowedDocuments = 0; // Số tài liệu đã mượn
     public int borrowedLimit; // Giới hạn sách có thể mượn
+    private List<BorrowRecord> borrowRecords;
 
     // Đọc đầu vào
     protected Scanner read = new Scanner(System.in);
@@ -29,52 +30,58 @@ public int borrowedDocuments = 0; // Số tài liệu đã mượn
         read.nextLine(); // Đọc ký tự newline còn lại sau nextInt()
     }
 
-    //getInfo người dùng
+    // getInfo người dùng
     public String getInfo() {
-        return "Tên người dùng: " + name + ", Email: " + email + ", ID người dùng: " + userID + ", Số tài liệu đã mượn: " + borrowedDocuments + ", Giới hạn tài liệu có thể mượn: " + borrowedLimit;
+        return "Tên người dùng: " + name + ", Email: " + email + ", ID người dùng: " + userID
+                + ", Số tài liệu đã mượn: " + borrowedDocuments + ", Giới hạn tài liệu có thể mượn: " + borrowedLimit;
     }
 
     @Override
     public String toString() {
         return getInfo();
     }
-    
-    //getter, setter Name.
+
+    // getter, setter Name.
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
-    
-    //getter, setter Email.
+
+    // getter, setter Email.
     public String getEmail() {
         return email;
     }
+
     public void setEmail(String email) {
         this.email = email;
     }
-    
-    //getter, setter UserID.
-    public String getUserID() { 
+
+    // getter, setter UserID.
+    public String getUserID() {
         return userID;
     }
+
     public void setUserID(String userID) {
         this.userID = userID;
     }
 
-    //getter, setter BorrowedDocuments.
+    // getter, setter BorrowedDocuments.
     public int getBorrowedDocuments() {
         return borrowedDocuments;
     }
+
     public void setBorrowedDocuments(int borrowedDocuments) {
         this.borrowedDocuments = borrowedDocuments;
     }
 
-    //getter, setter BorrowedLimit.
+    // getter, setter BorrowedLimit.
     public int getBorrowedLimit() {
         return borrowedLimit;
     }
+
     public void setBorrowedLimit(int borrowedLimit) {
         this.borrowedLimit = borrowedLimit;
     }
@@ -95,5 +102,14 @@ public int borrowedDocuments = 0; // Số tài liệu đã mượn
         } else {
             System.out.println("Số tài liệu trả không hợp lệ.");
         }
+    }
+
+    // Lưu các lần mượn tài liệu
+    public List<BorrowRecord> getBorrowRecords() {
+        return borrowRecords;
+    }
+
+    public void setBorrowRecords(List<BorrowRecord> borrowRecords) {
+        this.borrowRecords = borrowRecords;
     }
 }

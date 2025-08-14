@@ -32,7 +32,5 @@ public class LibraryUIDemo extends Application {
         }
     }
 
-    public static void main(String[] args) {
-        launch(args);
-    }
+    
 }

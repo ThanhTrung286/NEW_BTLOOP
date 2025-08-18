@@ -14,14 +14,16 @@ public class LibraryUIDemo extends Application {
     // Phương thức 'start' là điểm bắt đầu của ứng dụng
     @Override
     public void start(Stage primaryStage) {
-        try {         
-            Parent root = FXMLLoader.load(getClass().getResource("/com/NEW_BTLOOP/LibraryManagement/LibraryUIDemo.fxml"));
+        try {
+            Parent root = FXMLLoader
+                    .load(getClass().getResource("/com/NEW_BTLOOP/LibraryManagement/LibraryUIDemo.fxml"));
 
             // Tạo một Scene mới với giao diện đã tải từ FXML
             Scene scene = new Scene(root);
-
+            scene.getStylesheets().add(
+                    getClass().getResource("styles.css").toExternalForm());
             primaryStage.setTitle("Thư viện - Giao diện quản lý");
-            
+
             // Thiết lập Scene cho Stage chính và hiển thị
             primaryStage.setScene(scene);
             primaryStage.show();
@@ -32,5 +34,4 @@ public class LibraryUIDemo extends Application {
         }
     }
 
-    
 }

@@ -19,6 +19,8 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -37,14 +39,16 @@ public class LibraryUIDemoController {
     @FXML
     private Button searchButton;
     @FXML
-    private Button btnDashboard;
+    private ToggleGroup menuGroup;
     @FXML
-    private Button btnDocumentsList;
+    private ToggleButton btnDashboard;
     @FXML
-    private Button btnLoanManagement;
+    private ToggleButton btnDocumentsList;
     @FXML
-    private Button btnReadersManagement;
-
+    private ToggleButton btnLoanManagement;
+    @FXML
+    private ToggleButton btnReadersManagement;
+    
     // Các View chính
     @FXML
     private StackPane contentArea;
@@ -94,59 +98,38 @@ public class LibraryUIDemoController {
     public void initialize() {
         System.out.println("Controller đã được khởi tạo và liên kết với FXML!");
 
-        boolean dbReady = false;
-
         try {
-            // Thử kết nối CSDL
             libraryDB = new Library();
-            dbReady = true;
             System.out.println("Kết nối CSDL thành công!");
-        } catch (SQLException e) {
-            System.err.println("❌ Lỗi khi kết nối CSDL: " + e.getMessage());
-            // Có thể gán Library giả để UI vẫn chạy
-            // libraryDB = new LibraryMock(); // Nếu có class giả lập
-        }
-
-        // Nếu DB sẵn sàng mới load dữ liệu
-        if (dbReady) {
             populateDashboardBooks();
             showView(dashboardView);
-        } else {
-            System.err.println("⚠️ Không thể load dữ liệu Dashboard vì DB chưa sẵn sàng.");
-            // Hiển thị view dashboard trống hoặc view báo lỗi
+        } catch (SQLException e) {
+            System.err.println("❌ Lỗi khi kết nối CSDL: " + e.getMessage());
             showView(dashboardView);
         }
+        ToggleGroup menuGroup = new ToggleGroup();
+        // Ensure Dashboard is selected by default
+        btnDashboard.setSelected(true);
+        btnDashboard.setToggleGroup(menuGroup);
+        btnDocumentsList.setToggleGroup(menuGroup);
+        btnLoanManagement.setToggleGroup(menuGroup);
+        btnReadersManagement.setToggleGroup(menuGroup);
+        btnDashboard.setOnAction(event -> {
+            showView(dashboardView);
+            if (libraryDB != null) {
+                populateDashboardBooks();
+            }
+        });
 
-        // Thiết lập hành động cho các nút
-        if (btnDashboard != null) {
-            btnDashboard.setOnAction(event -> {
-                showView(dashboardView);
-                if (libraryDB != null) {
-                    populateDashboardBooks();
-                } else {
-                    System.err.println("⚠️ Không thể load Dashboard vì libraryDB = null");
-                }
-            });
-        }
+        btnDocumentsList.setOnAction(event -> {
+            showView(documentsListView);
+            if (libraryDB != null) {
+                populateAllDocumentCards();
+            }
+        });
 
-        if (btnDocumentsList != null) {
-            btnDocumentsList.setOnAction(event -> {
-                showView(documentsListView);
-                if (libraryDB != null) {
-                    populateAllDocumentCards();
-                } else {
-                    System.err.println("⚠️ Không thể load danh sách tài liệu vì libraryDB = null");
-                }
-            });
-        }
-
-        if (btnLoanManagement != null) {
-            btnLoanManagement.setOnAction(event -> showView(loanReturnView));
-        }
-
-        if (btnReadersManagement != null) {
-            btnReadersManagement.setOnAction(event -> showView(readersManagementView));
-        }
+        btnLoanManagement.setOnAction(event -> showView(loanReturnView));
+        btnReadersManagement.setOnAction(event -> showView(readersManagementView));
 
         if (btnBackToDocuments != null) {
             btnBackToDocuments.setOnAction(event -> {
@@ -162,23 +145,16 @@ public class LibraryUIDemoController {
                 if (libraryDB != null) {
                     String searchText = searchField.getText();
                     performSearch(searchText);
-                } else {
-                    System.err.println("⚠️ Không thể tìm kiếm vì libraryDB = null");
                 }
             });
         }
 
-        if (btnAddDocument != null) {
-            btnAddDocument.setOnAction(event -> handleAddDocument());
-        }
-
-        if (btnEditDocument != null) {
-            btnEditDocument.setOnAction(event -> handleEditDocument());
-        }
-
-        if (btnDeleteDocument != null) {
-            btnDeleteDocument.setOnAction(event -> handleDeleteDocument());
-        }
+        if (btnAddDocument != null)
+            btnAddDocument.setOnAction(e -> handleAddDocument());
+        if (btnEditDocument != null)
+            btnEditDocument.setOnAction(e -> handleEditDocument());
+        if (btnDeleteDocument != null)
+            btnDeleteDocument.setOnAction(e -> handleDeleteDocument());
     }
 
     private void showView(Node viewToShow) {
@@ -407,12 +383,11 @@ public class LibraryUIDemoController {
                     Document doc = libraryDB.getDocumentById(id);
                     if (doc != null) {
                         // Mở một Dialog mới để sửa thông tin sách
-                        if(doc instanceof Book)
-                        {
-                            Book book = (Book)doc;
+                        if (doc instanceof Book) {
+                            Book book = (Book) doc;
                             showEditBookDialog(book);
                         }
-                        
+
                     } else {
                         showAlert("Lỗi", "Không tìm thấy sách với ID: " + id, Alert.AlertType.ERROR);
                     }

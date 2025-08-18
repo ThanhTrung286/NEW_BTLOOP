@@ -2,6 +2,9 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
@@ -48,11 +51,10 @@
     <left>
         <VBox alignment="TOP_LEFT" prefWidth="200.0" spacing="15.0" style="-fx-background-color: #34495e; -fx-padding: 20 10;" BorderPane.alignment="TOP_LEFT">
             <children>
-                <Button fx:id="btnDashboard" maxWidth="1.7976931348623157E308" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 0 10 10; -fx-alignment: CENTER_LEFT;" text=" Dashboard" />
-                <Button fx:id="btnDocumentsList" maxWidth="1.7976931348623157E308" style="-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 0 10 10; -fx-alignment: CENTER_LEFT;" text=" Danh sách tài liệu" />
-                <Button fx:id="btnLoanManagement" maxWidth="1.7976931348623157E308" style="-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 0 10 10; -fx-alignment: CENTER_LEFT;" text=" Quản lý mượn trả" />
-                <Button fx:id="btnReadersManagement" maxWidth="1.7976931348623157E308" style="-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 0 10 10; -fx-alignment: CENTER_LEFT;" text=" Quản lý người đọc" />
-
+                <ToggleButton fx:id="btnDashboard" text=" Dashboard" maxWidth="1.7976931348623157E308" styleClass="menu-toggle" toggleGroup="$menuGroup" selected="true"/>
+                <ToggleButton fx:id="btnDocumentsList" text=" Danh sách tài liệu" maxWidth="1.7976931348623157E308" styleClass="menu-toggle" toggleGroup="$menuGroup"/>
+                <ToggleButton fx:id="btnLoanManagement" text=" Quản lý mượn trả" maxWidth="1.7976931348623157E308" styleClass="menu-toggle" toggleGroup="$menuGroup"/>
+                <ToggleButton fx:id="btnReadersManagement" text=" Quản lý người đọc" maxWidth="1.7976931348623157E308" styleClass="menu-toggle" toggleGroup="$menuGroup"/>
                 <Region VBox.vgrow="ALWAYS" />
                 <Separator prefWidth="200.0" style="-fx-background-color: #55606d;">
                     <VBox.margin>

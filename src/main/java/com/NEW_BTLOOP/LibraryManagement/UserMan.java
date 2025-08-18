@@ -37,7 +37,7 @@ public class UserMan {
             }
         }
     }
-    
+
     public void insertUser(User user) throws SQLException {
         String sql = "INSERT INTO user (UserID, Name, Email, BorrowedDoc, BorrowedLimit) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -77,70 +77,132 @@ public class UserMan {
         }
     }
 
-    public void insertBorrowRecord(BorrowRecord record) throws SQLException {
-        String id = generateNextID("BRW", "borrow_record");
-        record.setRecordID(id);
+    // Mượn tài liệu
+    public String insertBorrowRecord(String userId, String documentId, int borrowDays) throws SQLException {
+        // Generate RecordID
+        String recordId = generateNextID("BRW", "borrow_record");
 
-        conn.setAutoCommit(false);
-        try {
-            String sql = "INSERT INTO borrow_record (RecordID, UserID, DocumentID, BorrowDate, ExpectedReturnDate) VALUES (?, ?, ?, ?, ?)";
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setString(1, record.getRecordID());
-                stmt.setString(2, record.getUserID());
-                stmt.setString(3, record.getDocumentID());
-                stmt.setDate(4, Date.valueOf(record.getBorrowDate()));
-                stmt.setDate(5, Date.valueOf(record.getExpectedReturnDate()));
-                stmt.executeUpdate();
-            }
+        LocalDate borrowDate = LocalDate.now();
+        LocalDate expectedReturnDate = borrowDate.plusDays(borrowDays);
 
-            String updateDoc = "UPDATE document SET Available = Available - 1 WHERE ID = ?";
-            try (PreparedStatement stmt = conn.prepareStatement(updateDoc)) {
-                stmt.setString(1, record.getDocumentID());
-                stmt.executeUpdate();
-            }
+        String sql = "INSERT INTO borrow_record (RecordID, UserID, DocumentID, BorrowDate, ExpectedReturnDate) " +
+                "VALUES (?, ?, ?, ?, ?)";
 
-            conn.commit();
-        } catch (SQLException e) {
-            conn.rollback();
-            throw e;
-        } finally {
-            conn.setAutoCommit(true);
-        }
-    }
-
-    public void updateBorrowReturnDate(String recordID, LocalDate returnDate) throws SQLException {
-        if (!recordExists("borrow_record", recordID)) {
-            throw new SQLException("Borrow record not found: " + recordID);
-        }
-        conn.setAutoCommit(false);
-        try {
-            String sql = "UPDATE borrow_record SET ActualReturnDate=? WHERE RecordID=?";
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setDate(1, Date.valueOf(returnDate));
-                stmt.setString(2, recordID);
-                stmt.executeUpdate();
-            }
-
-            String docSql = "UPDATE document SET Available = Available + 1 WHERE ID = (SELECT DocumentID FROM borrow_record WHERE RecordID=?)";
-            try (PreparedStatement stmt = conn.prepareStatement(docSql)) {
-                stmt.setString(1, recordID);
-                stmt.executeUpdate();
-            }
-
-            conn.commit();
-        } catch (SQLException e) {
-            conn.rollback();
-            throw e;
-        } finally {
-            conn.setAutoCommit(true);
-        }
-    }
-
-    public List<BorrowRecord> getBorrowRecordsForUser(String userID) throws SQLException {
-        List<BorrowRecord> records = new ArrayList<>();
-        String sql = "SELECT * FROM borrow_record WHERE UserID=?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, userID);
+            stmt.setString(1, recordId);
+            stmt.setString(2, userId);
+            stmt.setString(3, documentId);
+            stmt.setDate(4, Date.valueOf(borrowDate));
+            stmt.setDate(5, Date.valueOf(expectedReturnDate));
+            stmt.executeUpdate();
+        }
+
+        // Reduce available count in document table
+        String updateDoc = "UPDATE document SET Available = Available - 1 WHERE ID = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(updateDoc)) {
+            stmt.setString(1, documentId);
+            stmt.executeUpdate();
+        }
+        return recordId;
+    }
+
+    // Trả tài liệu
+    public void returnBorrowRecord(String recordId, LocalDate actualReturnDate) throws SQLException {
+        // If no date provided, default to today
+        LocalDate returnDate = (actualReturnDate != null) ? actualReturnDate : LocalDate.now();
+
+        // Check if already returned
+        String checkSql = "SELECT DocumentID, ActualReturnDate FROM borrow_record WHERE RecordID = ?";
+        String docId = null;
+        try (PreparedStatement stmt = conn.prepareStatement(checkSql)) {
+            stmt.setString(1, recordId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Date actual = rs.getDate("ActualReturnDate");
+                    if (actual != null) {
+                        throw new SQLException("This borrow record has already been returned: " + recordId);
+                    }
+                    docId = rs.getString("DocumentID");
+                } else {
+                    throw new SQLException("Borrow record not found: " + recordId);
+                }
+            }
+        }
+
+        // Update ActualReturnDate
+        String sql = "UPDATE borrow_record SET ActualReturnDate = ? WHERE RecordID = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setDate(1, Date.valueOf(returnDate));
+            stmt.setString(2, recordId);
+            stmt.executeUpdate();
+        }
+
+        // Increase available count back
+        if (docId != null) {
+            String updateDoc = "UPDATE document SET Available = Available + 1 WHERE ID = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(updateDoc)) {
+                stmt.setString(1, docId);
+                stmt.executeUpdate();
+            }
+        }
+    }
+
+    // Tìm bằng userID
+    public List<BorrowRecord> searchBorrowRecordsByUser(String userId) throws SQLException {
+        List<BorrowRecord> records = new ArrayList<>();
+        String sql = "SELECT * FROM borrow_record WHERE UserID = ?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    BorrowRecord br = new BorrowRecord();
+                    br.setRecordID(rs.getString("RecordID"));
+                    br.setUserID(rs.getString("UserID"));
+                    br.setDocumentID(rs.getString("DocumentID"));
+                    br.setBorrowDate(rs.getDate("BorrowDate").toLocalDate());
+                    br.setExpectedReturnDate(rs.getDate("ExpectedReturnDate").toLocalDate());
+                    Date actual = rs.getDate("ActualReturnDate");
+                    if (actual != null) {
+                        br.setActualReturnDate(actual.toLocalDate());
+                    }
+                    records.add(br);
+                }
+            }
+        }
+        return records;
+    }
+
+    // Tìm bằng docID
+    public List<BorrowRecord> searchBorrowRecordsByDocument(String documentId) throws SQLException {
+        List<BorrowRecord> records = new ArrayList<>();
+        String sql = "SELECT * FROM borrow_record WHERE DocumentID = ?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, documentId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    BorrowRecord br = new BorrowRecord();
+                    br.setRecordID(rs.getString("RecordID"));
+                    br.setUserID(rs.getString("UserID"));
+                    br.setDocumentID(rs.getString("DocumentID"));
+                    br.setBorrowDate(rs.getDate("BorrowDate").toLocalDate());
+                    br.setExpectedReturnDate(rs.getDate("ExpectedReturnDate").toLocalDate());
+                    Date actual = rs.getDate("ActualReturnDate");
+                    if (actual != null) {
+                        br.setActualReturnDate(actual.toLocalDate());
+                    }
+                    records.add(br);
+                }
+            }
+        }
+        return records;
+    }
+
+    public List<BorrowRecord> listBorrowRecords() throws SQLException {
+        List<BorrowRecord> records = new ArrayList<>();
+        String sql = "SELECT * FROM borrow_record";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     BorrowRecord br = new BorrowRecord();

@@ -92,47 +92,47 @@ public class Library {
     }
 
     public Document getDocumentById(String id) throws SQLException {
-    String sql = "SELECT d.*, b.Publisher, b.NumberOfPages, b.Genre, b.ISBN, " +
-                 "t.University, t.Supervisor, t.Department " +
-                 "FROM document d " +
-                 "LEFT JOIN book b ON d.ID = b.ID " +
-                 "LEFT JOIN thesis t ON d.ID = t.ID " +
-                 "WHERE d.ID = ?";
+        String sql = "SELECT d.*, b.Publisher, b.NumberOfPages, b.Genre, b.ISBN, " +
+                "t.University, t.Supervisor, t.Department " +
+                "FROM document d " +
+                "LEFT JOIN book b ON d.ID = b.ID " +
+                "LEFT JOIN thesis t ON d.ID = t.ID " +
+                "WHERE d.ID = ?";
 
-    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-        stmt.setString(1, id);
-        try (ResultSet rs = stmt.executeQuery()) {
-            if (rs.next()) {
-                String docType = rs.getString("DocType");
-                if ("BOOK".equalsIgnoreCase(docType)) {
-                    Book b = new Book();
-                    b.setId(rs.getString("ID"));
-                    b.setTitle(rs.getString("Title"));
-                    b.setAuthor(rs.getString("Author"));
-                    b.setYear(rs.getInt("Year"));
-                    b.setTotal(rs.getInt("Total"));
-                    b.setAvail(rs.getInt("Available"));
-                    b.setPublisher(rs.getString("Publisher"));
-                    b.setNumberOfPages(rs.getInt("NumberOfPages"));
-                    b.setGenre(rs.getString("Genre"));
-                    b.setISBN(rs.getString("ISBN"));
-                    return b;
-                } else if ("THESIS".equalsIgnoreCase(docType)) {
-                    Thesis t = new Thesis();
-                    t.setId(rs.getString("ID"));
-                    t.setTitle(rs.getString("Title"));
-                    t.setAuthor(rs.getString("Author"));
-                    t.setYear(rs.getInt("Year"));
-                    t.setTotal(rs.getInt("Total"));
-                    t.setAvail(rs.getInt("Available"));
-                    t.setUniversity(rs.getString("University"));
-                    return t;
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    String docType = rs.getString("DocType");
+                    if ("BOOK".equalsIgnoreCase(docType)) {
+                        Book b = new Book();
+                        b.setId(rs.getString("ID"));
+                        b.setTitle(rs.getString("Title"));
+                        b.setAuthor(rs.getString("Author"));
+                        b.setYear(rs.getInt("Year"));
+                        b.setTotal(rs.getInt("Total"));
+                        b.setAvail(rs.getInt("Available"));
+                        b.setPublisher(rs.getString("Publisher"));
+                        b.setNumberOfPages(rs.getInt("NumberOfPages"));
+                        b.setGenre(rs.getString("Genre"));
+                        b.setISBN(rs.getString("ISBN"));
+                        return b;
+                    } else if ("THESIS".equalsIgnoreCase(docType)) {
+                        Thesis t = new Thesis();
+                        t.setId(rs.getString("ID"));
+                        t.setTitle(rs.getString("Title"));
+                        t.setAuthor(rs.getString("Author"));
+                        t.setYear(rs.getInt("Year"));
+                        t.setTotal(rs.getInt("Total"));
+                        t.setAvail(rs.getInt("Available"));
+                        t.setUniversity(rs.getString("University"));
+                        return t;
+                    }
                 }
             }
         }
+        return null; // No match found
     }
-    return null; // No match found
-}
 
     public void updateBook(Book book) throws SQLException {
         if (!recordExists("document", book.getId())) {
@@ -195,7 +195,7 @@ public class Library {
                 stmt.setString(3, thesis.getAuthor());
                 stmt.setInt(4, thesis.getTotal());
                 stmt.setInt(5, thesis.getAvail());
-                stmt.setInt(3, thesis.getYear());
+                stmt.setInt(6, thesis.getYear());
                 stmt.executeUpdate();
             }
 
@@ -364,14 +364,56 @@ public class Library {
     }
 
     public List<Document> generalSearch(String keyword) throws SQLException {
+        List<Document> results = new ArrayList<>();
         String lowerKeyword = "%" + keyword.toLowerCase() + "%";
-        return searchDocuments(Map.of(
-                "Title", keyword,
-                "Author", keyword,
-                "Publisher", keyword,
-                "Genre", keyword,
-                "University", keyword,
-                "ISBN", keyword));
+
+        String sql = "SELECT d.*, b.Publisher, b.NumberOfPages, b.Genre, b.ISBN, " +
+                "t.University " +
+                "FROM document d " +
+                "LEFT JOIN book b ON d.ID = b.ID " +
+                "LEFT JOIN thesis t ON d.ID = t.ID " +
+                "WHERE LOWER(d.Title) LIKE ? " +
+                "   OR LOWER(d.Author) LIKE ? " +
+                "   OR LOWER(b.Publisher) LIKE ? " +
+                "   OR LOWER(b.Genre) LIKE ? " +
+                "   OR LOWER(b.ISBN) LIKE ? " +
+                "   OR LOWER(t.University) LIKE ?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            for (int i = 1; i <= 6; i++) {
+                stmt.setString(i, lowerKeyword);
+            }
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    String docType = rs.getString("DocType");
+                    if ("BOOK".equalsIgnoreCase(docType)) {
+                        Book b = new Book();
+                        b.setId(rs.getString("ID"));
+                        b.setTitle(rs.getString("Title"));
+                        b.setAuthor(rs.getString("Author"));
+                        b.setYear(rs.getInt("Year"));
+                        b.setTotal(rs.getInt("Total"));
+                        b.setAvail(rs.getInt("Available"));
+                        b.setPublisher(rs.getString("Publisher"));
+                        b.setNumberOfPages(rs.getInt("NumberOfPages"));
+                        b.setGenre(rs.getString("Genre"));
+                        b.setISBN(rs.getString("ISBN"));
+                        results.add(b);
+                    } else if ("THESIS".equalsIgnoreCase(docType)) {
+                        Thesis t = new Thesis();
+                        t.setId(rs.getString("ID"));
+                        t.setTitle(rs.getString("Title"));
+                        t.setAuthor(rs.getString("Author"));
+                        t.setYear(rs.getInt("Year"));
+                        t.setTotal(rs.getInt("Total"));
+                        t.setAvail(rs.getInt("Available"));
+                        t.setUniversity(rs.getString("University"));
+                        results.add(t);
+                    }
+                }
+            }
+        }
+        return results;
     }
 
     public void insertUser(User user) throws SQLException {
@@ -495,6 +537,27 @@ public class Library {
         return records;
     }
 
+    public List<BorrowRecord> listBorrowRecords() throws SQLException {
+        List<BorrowRecord> records = new ArrayList<>();
+        String sql = "SELECT * FROM borrow_record";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    BorrowRecord br = new BorrowRecord();
+                    br.setRecordID(rs.getString("RecordID"));
+                    br.setUserID(rs.getString("UserID"));
+                    br.setDocumentID(rs.getString("DocumentID"));
+                    br.setBorrowDate(rs.getDate("BorrowDate").toLocalDate());
+                    br.setExpectedReturnDate(rs.getDate("ExpectedReturnDate").toLocalDate());
+                    Date actual = rs.getDate("ActualReturnDate");
+                    if (actual != null)
+                        br.setActualReturnDate(actual.toLocalDate());
+                    records.add(br);
+                }
+            }
+        }
+        return records;
+    }
     public void updateBorrowedDocuments(String userId, int newCount) throws SQLException {
         String sql = "UPDATE user SET BorrowedDoc = ? WHERE UserID = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {

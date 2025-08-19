@@ -15,20 +15,6 @@ public class User {
     protected Scanner read = new Scanner(System.in);
 
     // Constructor
-    public User() {
-        System.out.println("Nhập tên người dùng: ");
-        name = read.nextLine();
-
-        System.out.println("Nhập email: ");
-        email = read.nextLine();
-
-        System.out.println("Nhập ID người dùng: ");
-        userID = read.nextLine();
-
-        System.out.println("Nhập giới hạn sách có thể mượn: ");
-        borrowedLimit = read.nextInt();
-        read.nextLine(); // Đọc ký tự newline còn lại sau nextInt()
-    }
 
     // getInfo người dùng
     public String getInfo() {

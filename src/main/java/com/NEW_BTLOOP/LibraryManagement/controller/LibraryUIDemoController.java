@@ -1,10 +1,9 @@
 package com.NEW_BTLOOP.LibraryManagement.controller;
 
-import com.NEW_BTLOOP.LibraryManagement.Book;
-import com.NEW_BTLOOP.LibraryManagement.Document;
-import com.NEW_BTLOOP.LibraryManagement.Library;
-import com.NEW_BTLOOP.LibraryManagement.Thesis;
+import com.NEW_BTLOOP.LibraryManagement.*;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -13,19 +12,28 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.Pagination;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.util.Pair;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class LibraryUIDemoController {
 
@@ -48,7 +56,7 @@ public class LibraryUIDemoController {
     private ToggleButton btnLoanManagement;
     @FXML
     private ToggleButton btnReadersManagement;
-    
+
     // Các View chính
     @FXML
     private StackPane contentArea;
@@ -91,8 +99,62 @@ public class LibraryUIDemoController {
     @FXML
     private Button btnDeleteDocument;
 
+    @FXML
+    private TableView<User> readersTable;
+    @FXML
+    private TableColumn<User, String> colUserID;
+    @FXML
+    private TableColumn<User, String> colName;
+    @FXML
+    private TableColumn<User, String> colEmail;
+    @FXML
+    private TableColumn<User, Integer> colBorrowedDocs;
+    @FXML
+    private TableColumn<User, Integer> colBorrowedLimit;
+    @FXML
+    private Pagination readersPagination;
+    @FXML
+    private Button btnAddReader;
+    @FXML
+    private Button btnEditReader;
+    @FXML
+    private Button btnDeleteReader;
+
+    @FXML
+    private TableView<BorrowRecord> borrowTable;
+
+    @FXML
+    private TableColumn<BorrowRecord, String> recordIdCol;
+    @FXML
+    private TableColumn<BorrowRecord, String> userIdCol;
+    @FXML
+    private TableColumn<BorrowRecord, String> documentIdCol;
+    @FXML
+    private TableColumn<BorrowRecord, LocalDate> borrowDateCol;
+    @FXML
+    private TableColumn<BorrowRecord, LocalDate> expectedReturnDateCol;
+    @FXML
+    private TableColumn<BorrowRecord, LocalDate> actualReturnDateCol;
+    @FXML
+    private Button btnBorrow;
+    @FXML
+    private Button btnReturn;
+
+    @FXML
+    private Button btnLogin;
+
+    @FXML
+    private Button btnLogout;
+
+    // Biến trạng thái đăng nhập
+    private boolean isLoggedIn = false;
+
     // Đối tượng Library để kết nối và thao tác với CSDL
     private Library libraryDB;
+    private UserMan userMan;
+    private ObservableList<User> allReaders = FXCollections.observableArrayList();
+    private ObservableList<BorrowRecord> allRecords = FXCollections.observableArrayList();
+    private static final int ITEMS_PER_PAGE = 20;
 
     @FXML
     public void initialize() {
@@ -100,6 +162,7 @@ public class LibraryUIDemoController {
 
         try {
             libraryDB = new Library();
+            userMan = new UserMan();
             System.out.println("Kết nối CSDL thành công!");
             populateDashboardBooks();
             showView(dashboardView);
@@ -115,21 +178,17 @@ public class LibraryUIDemoController {
         btnLoanManagement.setToggleGroup(menuGroup);
         btnReadersManagement.setToggleGroup(menuGroup);
         btnDashboard.setOnAction(event -> {
-            showView(dashboardView);
-            if (libraryDB != null) {
-                populateDashboardBooks();
-            }
-        });
-
-        btnDocumentsList.setOnAction(event -> {
-            showView(documentsListView);
-            if (libraryDB != null) {
-                populateAllDocumentCards();
-            }
-        });
-
-        btnLoanManagement.setOnAction(event -> showView(loanReturnView));
-        btnReadersManagement.setOnAction(event -> showView(readersManagementView));
+        handleNavigation(btnDashboard, dashboardView, () -> {});
+    });
+    btnDocumentsList.setOnAction(event -> {
+        handleNavigation(btnDocumentsList, documentsListView, () -> populateAllDocumentCards());
+    });
+    btnLoanManagement.setOnAction(event -> {
+        handleNavigation(btnLoanManagement, loanReturnView, () -> {});
+    });
+    btnReadersManagement.setOnAction(event -> {
+        handleNavigation(btnReadersManagement, readersManagementView, () -> populateReadersList());
+    });
 
         if (btnBackToDocuments != null) {
             btnBackToDocuments.setOnAction(event -> {
@@ -155,6 +214,60 @@ public class LibraryUIDemoController {
             btnEditDocument.setOnAction(e -> handleEditDocument());
         if (btnDeleteDocument != null)
             btnDeleteDocument.setOnAction(e -> handleDeleteDocument());
+        // Gán sự kiện cho các nút quản lý người đọc
+        btnReadersManagement.setOnAction(event -> {
+            showView(readersManagementView);
+            populateReadersList(); // Tải dữ liệu khi chuyển sang tab Quản lý người đọc
+        });
+        btnAddReader.setOnAction(event -> handleAddReader());
+        btnEditReader.setOnAction(event -> handleEditReader());
+        btnDeleteReader.setOnAction(event -> handleDeleteReader());
+
+        btnBorrow.setOnAction(event -> handleBorrowDocument());
+        btnReturn.setOnAction(event -> handleReturnDocument());
+        // Cấu hình các cột của TableView
+        colUserID.setCellValueFactory(new PropertyValueFactory<>("userID"));
+        colName.setCellValueFactory(new PropertyValueFactory<>("name"));
+        colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
+        colBorrowedDocs.setCellValueFactory(new PropertyValueFactory<>("borrowedDocuments"));
+        colBorrowedLimit.setCellValueFactory(new PropertyValueFactory<>("borrowedLimit"));
+
+        recordIdCol.setCellValueFactory(new PropertyValueFactory<>("recordID"));
+        userIdCol.setCellValueFactory(new PropertyValueFactory<>("userID"));
+        documentIdCol.setCellValueFactory(new PropertyValueFactory<>("documentID"));
+        borrowDateCol.setCellValueFactory(new PropertyValueFactory<>("borrowDate"));
+        expectedReturnDateCol.setCellValueFactory(new PropertyValueFactory<>("expectedReturnDate"));
+        actualReturnDateCol.setCellValueFactory(new PropertyValueFactory<>("actualReturnDate"));
+
+        // Tải dữ liệu và phân trang
+        loadAllReaders();
+        setupPagination();
+
+        loadAllRecords();
+        // Khởi tạo các view ban đầu
+        populateDashboardBooks();
+        populateAllDocumentCards();
+        populateReadersList();
+        populateRecordList();
+
+        System.out.println("Số lượng readers: " + allReaders.size());
+        for (User u : allReaders) {
+            System.out.println(u.getUserID() + " - " + u.getName());
+        }
+
+        readersTable.setItems(allReaders);
+        borrowTable.setItems(allRecords);
+        if (btnBackToDocuments != null) {
+            btnBackToDocuments.setOnAction(event -> {
+                showView(documentsListView);
+                if (libraryDB != null) {
+                    populateAllDocumentCards();
+                }
+            });
+        }
+        btnLogin.setOnAction(event -> handleLogin());
+        btnLogout.setOnAction(event -> handleLogout());
+        updateLoginStatus(); // Đảm bảo trạng thái ban đầu là "chưa đăng nhập"
     }
 
     private void showView(Node viewToShow) {
@@ -470,11 +583,324 @@ public class LibraryUIDemoController {
         });
     }
 
+    // -------------------- CÁC CHỨC NĂNG QUẢN LÝ NGƯỜI ĐỌC --------------------
+    private void loadAllReaders() {
+        try {
+            allReaders.clear();
+            allReaders.addAll(userMan.listUsers());
+        } catch (SQLException e) {
+            showAlert("Lỗi CSDL", "Không thể tải danh sách người dùng: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    private void setupPagination() {
+        int pageCount = (int) Math.ceil((double) allReaders.size() / ITEMS_PER_PAGE);
+        readersPagination.setPageCount(pageCount > 0 ? pageCount : 1);
+
+        readersPagination.setPageFactory(pageIndex -> {
+            int fromIndex = pageIndex * ITEMS_PER_PAGE;
+            int toIndex = Math.min(fromIndex + ITEMS_PER_PAGE, allReaders.size());
+
+            // chỉ CẬP NHẬT dữ liệu cho bảng
+            readersTable.setItems(FXCollections.observableArrayList(
+                    allReaders.subList(fromIndex, toIndex)));
+
+            // KHÔNG trả về readersTable nữa
+            return new Pane(); // hoặc: return null;
+        });
+
+        // Hiển thị luôn trang đầu tiên
+        if (!allReaders.isEmpty()) {
+            readersPagination.setCurrentPageIndex(0);
+            readersTable.setItems(FXCollections.observableArrayList(
+                    allReaders.subList(0, Math.min(ITEMS_PER_PAGE, allReaders.size()))));
+        } else {
+            readersTable.setItems(FXCollections.observableArrayList());
+        }
+    }
+
+    // Chức năng thêm người đọc
+    private void handleAddReader() {
+        Dialog<User> dialog = new Dialog<>();
+        dialog.setTitle("Thêm Người Đọc Mới");
+        dialog.setHeaderText("Nhập thông tin chi tiết của người đọc:");
+
+        TextField nameField = new TextField();
+        nameField.setPromptText("Họ và Tên");
+        TextField emailField = new TextField();
+        emailField.setPromptText("Email");
+        TextField borrowedLimitField = new TextField();
+        borrowedLimitField.setPromptText("Hạn mức mượn");
+
+        VBox content = new VBox(10,
+                new Label("Họ và Tên:"), nameField,
+                new Label("Email:"), emailField,
+                new Label("Hạn mức mượn:"), borrowedLimitField);
+        dialog.getDialogPane().setContent(content);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == ButtonType.OK) {
+                User newUser = new User();
+                newUser.setName(nameField.getText());
+                newUser.setEmail(emailField.getText());
+                newUser.setBorrowedLimit(Integer.parseInt(borrowedLimitField.getText()));
+                newUser.setBorrowedDocuments(0);
+                return newUser;
+            }
+            return null;
+        });
+
+        dialog.showAndWait().ifPresent(newUser -> {
+            try {
+                userMan.insertUser(newUser);
+                showAlert("Thành công", "Đã thêm người đọc thành công!", Alert.AlertType.INFORMATION);
+                populateReadersList();
+            } catch (SQLException e) {
+                showAlert("Lỗi", "Thêm người đọc thất bại: " + e.getMessage(), Alert.AlertType.ERROR);
+            }
+        });
+    }
+
+    // Chức năng sửa người đọc
+    private void handleEditReader() {
+        TextInputDialog idDialog = new TextInputDialog();
+        idDialog.setTitle("Sửa Thông Tin Người Đọc");
+        idDialog.setHeaderText("Nhập UserID của người đọc cần sửa:");
+        idDialog.setContentText("UserID:");
+
+        idDialog.showAndWait().ifPresent(id -> {
+            try {
+                User user = userMan.getUserByID(id);
+                if (user != null) {
+                    showEditUserDialog(user);
+                } else {
+                    showAlert("Lỗi", "Không tìm thấy người dùng với UserID: " + id, Alert.AlertType.ERROR);
+                }
+            } catch (SQLException e) {
+                showAlert("Lỗi", "Lỗi CSDL khi tìm người dùng: " + e.getMessage(), Alert.AlertType.ERROR);
+            }
+        });
+    }
+
+    private void showEditUserDialog(User user) {
+        Dialog<User> dialog = new Dialog<>();
+        dialog.setTitle("Sửa Thông Tin Người Đọc");
+        dialog.setHeaderText("Chỉnh sửa thông tin cho người đọc có UserID: " + user.getUserID());
+
+        TextField nameField = new TextField(user.getName());
+        TextField emailField = new TextField(user.getEmail());
+        TextField borrowedLimitField = new TextField(String.valueOf(user.getBorrowedLimit()));
+
+        VBox content = new VBox(10,
+                new Label("Họ và Tên:"), nameField,
+                new Label("Email:"), emailField,
+                new Label("Hạn mức mượn:"), borrowedLimitField);
+        dialog.getDialogPane().setContent(content);
+
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == ButtonType.OK) {
+                user.setName(nameField.getText());
+                user.setEmail(emailField.getText());
+                user.setBorrowedLimit(Integer.parseInt(borrowedLimitField.getText()));
+                return user;
+            }
+            return null;
+        });
+
+        dialog.showAndWait().ifPresent(updatedUser -> {
+            try {
+                userMan.updateUser(updatedUser);
+                showAlert("Thành công", "Đã cập nhật thông tin người dùng thành công!", Alert.AlertType.INFORMATION);
+                populateReadersList();
+            } catch (SQLException e) {
+                showAlert("Lỗi", "Cập nhật người dùng thất bại: " + e.getMessage(), Alert.AlertType.ERROR);
+            }
+        });
+    }
+
+    // Chức năng xóa người đọc
+    private void handleDeleteReader() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Xóa Người Đọc");
+        dialog.setHeaderText("Nhập UserID của người đọc cần xóa:");
+        dialog.setContentText("UserID:");
+
+        dialog.showAndWait().ifPresent(id -> {
+            try {
+                userMan.deleteUser(id);
+                showAlert("Thành công", "Đã xóa người dùng thành công!", Alert.AlertType.INFORMATION);
+                populateReadersList();
+            } catch (SQLException e) {
+                showAlert("Lỗi", "Xóa người dùng thất bại: " + e.getMessage(), Alert.AlertType.ERROR);
+            }
+        });
+    }
+
+    //-------------------- CÁC CHỨC NĂNG QUẢN LÝ ĐĂNG NHẬP --------------------
+
+    private void handleNavigation(ToggleButton btnDashboard2, VBox view, Runnable task) {
+        if (isLoggedIn) {
+            showView(view);
+            task.run(); // Chạy tác vụ tải dữ liệu
+        } else {
+            showAlert("Thông báo", "Vui lòng đăng nhập để truy cập chức năng này.", Alert.AlertType.WARNING);
+        }
+    }
+
+    @FXML
+    private void handleLogin() {
+        // Tạo hộp thoại đăng nhập
+        Dialog<Pair<String, String>> dialog = new Dialog<>();
+        dialog.setTitle("Đăng nhập");
+
+        // Tạo các trường nhập liệu
+        VBox content = new VBox(10);
+        TextField usernameField = new TextField();
+        usernameField.setPromptText("Tên người dùng");
+        PasswordField passwordField = new PasswordField();
+        passwordField.setPromptText("Mật khẩu");
+
+        content.getChildren().addAll(new Label("Tên người dùng:"), usernameField,
+                                 new Label("Mật khẩu:"), passwordField);
+        dialog.getDialogPane().setContent(content);
+
+        // Thêm các nút OK và Cancel
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        // Chuyển đổi kết quả
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == ButtonType.OK) {
+                return new Pair<>(usernameField.getText(), passwordField.getText());
+            }
+            return null;
+        });
+
+    // Xử lý kết quả khi đăng nhập
+    Optional<Pair<String, String>> result = dialog.showAndWait();
+        result.ifPresent(credentials -> {
+            String username = credentials.getKey();
+            String password = credentials.getValue();
+        
+            // Kiểm tra thông tin đăng nhập
+            if (username.equals("root") && password.equals("root")) {
+               showAlert("Thông báo", "Đăng nhập thành công!", Alert.AlertType.INFORMATION);
+               isLoggedIn = true;
+               updateLoginStatus();
+            } else {
+               showAlert("Lỗi", "Tên người dùng hoặc mật khẩu không đúng.", Alert.AlertType.ERROR);
+            }
+        });
+    }
+    private void updateLoginStatus() {
+    btnLogin.setVisible(!isLoggedIn);
+    btnLogin.setManaged(!isLoggedIn);
+    
+    btnLogout.setVisible(isLoggedIn);
+    btnLogout.setManaged(isLoggedIn);
+    }
+
+    @FXML
+    private void handleLogout() {
+        isLoggedIn = false;
+        updateLoginStatus();
+        showAlert("Thông báo", "Đã đăng xuất.", Alert.AlertType.INFORMATION);
+    }
+    // -------------------- CÁC CHỨC NĂNG HỖ TRỢ --------------------
+
+    private void populateReadersList() {
+        loadAllReaders();
+        setupPagination();
+    }
+
+    private void populateRecordList() {
+        loadAllRecords();
+    }
+
     private void showAlert(String title, String message, Alert.AlertType type) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    // quản lí mượn trả
+    private void loadAllRecords() {
+        try {
+            allRecords.clear();
+            allRecords.addAll(userMan.listBorrowRecords());
+        } catch (SQLException e) {
+            showAlert("Lỗi CSDL", "Không thể tải lịch sử mượn trả: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    // Chức năng cho mượn
+    private void handleBorrowDocument() {
+        Dialog dialog = new TextInputDialog();
+        dialog.setTitle("Mượn Tài Liệu");
+        dialog.setHeaderText("Nhập UserID và DocumentID để mượn tài liệu:");
+
+        // dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK,
+        // ButtonType.CANCEL);
+
+        VBox content = new VBox(10);
+        TextField userIdField = new TextField();
+        userIdField.setPromptText("UserID");
+        TextField documentIdField = new TextField();
+        documentIdField.setPromptText("DocumentID");
+        TextField daysField = new TextField();
+        daysField.setPromptText("Số ngày mượn");
+
+        content.getChildren().addAll(new Label("UserID:"), userIdField, new Label("DocumentID:"), documentIdField,
+                new Label("Số ngày mượn:"), daysField);
+        dialog.getDialogPane().setContent(content);
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == ButtonType.OK) {
+                BorrowRecord brw = new BorrowRecord();
+                brw.setUserID(userIdField.getText());
+                brw.setDocumentID(documentIdField.getText());
+                brw.setBorrowDate(LocalDate.now());
+                brw.setExpectedReturnDate(brw.getBorrowDate().plusDays(Integer.parseInt(daysField.getText())));
+                // Cập nhật các trường còn lại
+                return brw;
+            }
+            return null;
+        }
+        );
+        dialog.showAndWait().ifPresent(result -> {
+            String userId = userIdField.getText();
+            String documentId = documentIdField.getText();
+            int days = Integer.parseInt(daysField.getText());
+            try {
+                userMan.insertBorrowRecord(userId, documentId, days);
+                populateRecordList();
+                showAlert("Thành công", "Đã mượn tài liệu thành công!", Alert.AlertType.INFORMATION);
+            } catch (SQLException e) {
+                showAlert("Lỗi", "Mượn tài liệu thất bại: " + e.getMessage(), Alert.AlertType.ERROR);
+            }
+        });
+        
+    }
+
+    // Chức năng trả tài liệu
+    private void handleReturnDocument() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Trả Tài Liệu");
+        dialog.setHeaderText("Nhập RecordID của tài liệu cần trả:");
+        dialog.setContentText("RecordID:");
+        
+        dialog.showAndWait().ifPresent(recordId -> {
+            try {
+                userMan.returnBorrowRecord(recordId, LocalDate.now());
+                populateRecordList();
+                showAlert("Thành công", "Đã trả tài liệu thành công!", Alert.AlertType.INFORMATION);
+            } catch (SQLException e) {
+                showAlert("Lỗi", "Trả tài liệu thất bại: " + e.getMessage(), Alert.AlertType.ERROR);
+            }
+        });
+        
     }
 }

@@ -1,19 +1,29 @@
 package com.NEW_BTLOOP.LibraryManagement;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 public class UserMan {
-    private final Connection conn;
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/library";
+    private static final String USER = "root";
+    private static final String PASS = "root";
 
-    public UserMan(Connection conn) {
-        this.conn = conn;
+    private Connection conn;
+
+    public UserMan() throws SQLException {
+        conn = DriverManager.getConnection(DB_URL, USER, PASS);
     }
 
     private String generateNextID(String prefix, String tableName) throws SQLException {
-        String sql = "SELECT ID FROM " + tableName + " WHERE ID LIKE ? ORDER BY ID DESC LIMIT 1";
+        String sql = "SELECT UserID FROM " + tableName + " WHERE UserID LIKE ? ORDER BY UserID DESC LIMIT 1";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, prefix + "%");
             try (ResultSet rs = stmt.executeQuery()) {
@@ -28,6 +38,21 @@ public class UserMan {
         }
     }
 
+    private String generateNextRecordID(String prefix, String tableName) throws SQLException {
+        String sql = "SELECT RecordID FROM " + tableName + " WHERE RecordID LIKE ? ORDER BY RecordID DESC LIMIT 1";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, prefix + "%");
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    String lastId = rs.getString("RecordID");
+                    int number = Integer.parseInt(lastId.substring(3));
+                    return String.format("%s%06d", prefix, number + 1);
+                } else {
+                    return prefix + "000001";
+                }
+            }
+        }
+    }
     public boolean recordExists(String tableName, String id) throws SQLException {
         String sql = "SELECT COUNT(*) FROM " + tableName + " WHERE ID = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -39,6 +64,7 @@ public class UserMan {
     }
 
     public void insertUser(User user) throws SQLException {
+        user.setUserID(generateNextID("USR","user"));
         String sql = "INSERT INTO user (UserID, Name, Email, BorrowedDoc, BorrowedLimit) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, user.getUserID());
@@ -80,7 +106,7 @@ public class UserMan {
     // Mượn tài liệu
     public String insertBorrowRecord(String userId, String documentId, int borrowDays) throws SQLException {
         // Generate RecordID
-        String recordId = generateNextID("BRW", "borrow_record");
+        String recordId = generateNextRecordID("BRW", "borrow_record");
 
         LocalDate borrowDate = LocalDate.now();
         LocalDate expectedReturnDate = borrowDate.plusDays(borrowDays);
@@ -237,6 +263,40 @@ public class UserMan {
         String sql = "DELETE FROM user WHERE UserID = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, userId);
+            stmt.executeUpdate();
+        }
+    }
+
+    public User getUserByID(String userId) throws SQLException {
+    String sql = "SELECT * FROM user WHERE UserID = ?";
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setString(1, userId);
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                User user = new User();
+                user.setUserID(rs.getString("UserID"));
+                user.setName(rs.getString("Name"));
+                user.setEmail(rs.getString("Email"));
+                user.setBorrowedDocuments(rs.getInt("BorrowedDoc"));
+                user.setBorrowedLimit(rs.getInt("BorrowedLimit"));
+                return user;
+            }
+        }
+    }
+    return null;
+    }
+
+    public void updateUser(User user) throws SQLException {
+        if (!checkUserExists("user", user.getUserID())) {
+            throw new SQLException("User ID not found: " + user.getUserID());
+        }
+        String sql = "UPDATE user SET Name=?, Email=?, BorrowedDoc=?, BorrowedLimit=? WHERE UserID=?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, user.getName());
+            stmt.setString(2, user.getEmail());
+            stmt.setInt(3, user.getBorrowedDocuments());
+            stmt.setInt(4, user.getBorrowedLimit());
+            stmt.setString(5, user.getUserID());
             stmt.executeUpdate();
         }
     }

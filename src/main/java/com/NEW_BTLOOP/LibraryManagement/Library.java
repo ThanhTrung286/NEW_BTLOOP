@@ -18,7 +18,7 @@ public class Library {
 
     public Library() throws SQLException {
         conn = DriverManager.getConnection(DB_URL, USER, PASS);
-        UserMan userManager = new UserMan(conn);
+
     }
 
     public void close() throws SQLException {

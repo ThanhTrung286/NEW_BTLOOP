@@ -131,7 +131,7 @@ public class Library {
                 }
             }
         }
-        return null; // No match found
+        return null; 
     }
 
     public void updateBook(Book book) throws SQLException {

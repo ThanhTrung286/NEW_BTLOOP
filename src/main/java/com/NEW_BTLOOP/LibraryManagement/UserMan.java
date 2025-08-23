@@ -28,7 +28,7 @@ public class UserMan {
             stmt.setString(1, prefix + "%");
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    String lastId = rs.getString("ID");
+                    String lastId = rs.getString("UserID");
                     int number = Integer.parseInt(lastId.substring(3));
                     return String.format("%s%06d", prefix, number + 1);
                 } else {
@@ -105,7 +105,6 @@ public class UserMan {
 
     // Mượn tài liệu
     public String insertBorrowRecord(String userId, String documentId, int borrowDays) throws SQLException {
-        // Generate RecordID
         String recordId = generateNextRecordID("BRW", "borrow_record");
 
         LocalDate borrowDate = LocalDate.now();
@@ -123,7 +122,6 @@ public class UserMan {
             stmt.executeUpdate();
         }
 
-        // Reduce available count in document table
         String updateDoc = "UPDATE document SET Available = Available - 1 WHERE ID = ?";
         try (PreparedStatement stmt = conn.prepareStatement(updateDoc)) {
             stmt.setString(1, documentId);
@@ -134,10 +132,8 @@ public class UserMan {
 
     // Trả tài liệu
     public void returnBorrowRecord(String recordId, LocalDate actualReturnDate) throws SQLException {
-        // If no date provided, default to today
         LocalDate returnDate = (actualReturnDate != null) ? actualReturnDate : LocalDate.now();
 
-        // Check if already returned
         String checkSql = "SELECT DocumentID, ActualReturnDate FROM borrow_record WHERE RecordID = ?";
         String docId = null;
         try (PreparedStatement stmt = conn.prepareStatement(checkSql)) {
@@ -155,7 +151,6 @@ public class UserMan {
             }
         }
 
-        // Update ActualReturnDate
         String sql = "UPDATE borrow_record SET ActualReturnDate = ? WHERE RecordID = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setDate(1, Date.valueOf(returnDate));
@@ -163,7 +158,6 @@ public class UserMan {
             stmt.executeUpdate();
         }
 
-        // Increase available count back
         if (docId != null) {
             String updateDoc = "UPDATE document SET Available = Available + 1 WHERE ID = ?";
             try (PreparedStatement stmt = conn.prepareStatement(updateDoc)) {

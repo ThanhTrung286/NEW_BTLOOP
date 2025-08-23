@@ -10,23 +10,7 @@ public class User {
     public int borrowedDocuments = 0; // Số tài liệu đã mượn
     public int borrowedLimit; // Giới hạn sách có thể mượn
     private List<BorrowRecord> borrowRecords;
-
-    // Đọc đầu vào
-    protected Scanner read = new Scanner(System.in);
-
-    // Constructor
-
-    // getInfo người dùng
-    public String getInfo() {
-        return "Tên người dùng: " + name + ", Email: " + email + ", ID người dùng: " + userID
-                + ", Số tài liệu đã mượn: " + borrowedDocuments + ", Giới hạn tài liệu có thể mượn: " + borrowedLimit;
-    }
-
-    @Override
-    public String toString() {
-        return getInfo();
-    }
-
+    
     // getter, setter Name.
     public String getName() {
         return name;

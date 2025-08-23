@@ -18,7 +18,7 @@ Dự án **Library Management System** được xây dựng bằng **Java** và 
 - 📑 Quản lý phiếu mượn (`BorrowRecord`)
 
 ## 🗂️ Class Diagram
-<img src="out/src/class-diagram/class-diagram.png" alt="Class Diagram" width="600"/>
+<img width="853" height="2026" alt="class-diagram" src="https://github.com/user-attachments/assets/cce4529a-e035-4e6f-8b60-2a39dfcadc77" />
 
 ## 🎥 Video Demo
 [▶️ Xem Video Demo](https://youtu.be/DS6LAtY3LWM)

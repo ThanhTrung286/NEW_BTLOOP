@@ -14,6 +14,7 @@ Dự án **Library Management System** được xây dựng bằng **Java** và 
   - Thêm / xóa người dùng
   - Cho mượn tài liệu
   - Trả tài liệu
+  - Tìm kiếm tài liệu
 - 📑 Quản lý phiếu mượn (`BorrowRecord`)
 
 ## 🗂️ Class Diagram
@@ -26,3 +27,19 @@ Dự án **Library Management System** được xây dựng bằng **Java** và 
 1. Clone repo:
    ```bash
    git clone https://github.com/ThanhTrung286/NEW_BTLOOP.git
+2. Cấu hình CSDL
+   Cài đặt MySQL theo cấu hình mặc định.\
+   Tạo người dùng "root" mật khẩu là "root".\
+   Tạo CSDL MySql mới:
+   ```bash
+   mysql -u root -p
+   ```
+   ```mysql
+   create database library
+   use library
+   exit
+   ```
+   Import tệp library.sql trong resource:
+   ```bash
+   mysql -u root -p library < library.sql
+  3. Chạy lớp Main.java
